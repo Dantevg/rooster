@@ -1,0 +1,82 @@
+<HTML>
+<HEAD>
+	<title>Alternatief rooster v1.4</title>
+	<link rel="stylesheet" type="text/css" href="/style.css">
+
+	<script src="/cookie.min.js"></script>
+	<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+	<script type="text/javascript">
+		function getSchedule(user, offset){
+			if( user == "" ){ user = Cookies.get("user") };
+			if( user == "" ){ user = "0000" };
+			$.getJSON( "https://citadelcollege.zportal.nl/api/v3/appointments?user=" + user + "&startWeekOffset=" + offset + "&endWeekOffset=" + (Number(offset)+1) + "&access_token=fg0ndvvhh04stm80josoimuok4" )
+				.done( function(data){
+					$("main .rooster").empty();
+					var roosterdata = data["response"]["data"];
+					for( var i = 0; i < roosterdata.length; ++i ){
+						var startdate = new Date(roosterdata[i]["start"]*1000);
+						var starttime = startdate.getHours() + startdate.getMinutes()/60;
+						var enddate = new Date(roosterdata[i]["end"]*1000);
+						var endtime = enddate.getHours() + enddate.getMinutes()/60;
+						var day = startdate.getDay();
+						var size = endtime - starttime;
+						var desc = {};
+						desc.vak = roosterdata[i]["subjects"].join(", ");
+						desc.docent = roosterdata[i]["teachers"].join(", ");
+						desc.klas = roosterdata[i]["groups"].join(", ");
+						desc.lokaal = roosterdata[i]["locations"].join(", ");
+						desc.opmerking = roosterdata[i].remark;
+						$("main .rooster").append("<div class='lesson' style='top:"+((starttime-8.5)*70)+"; left:"+((day-1)*150+50)+"; height:"+size*70+"'><span class='les-vak'>"+desc.vak+"</span><br><span class='les-lokaal'>"+desc.lokaal+"</span><br><span class='les-docent'><a href='' onclick='getSchedule(\""+desc.docent+"\",$(\"#week option:selected\").val()); return false;'>"+desc.docent+"</a></span><br><span class='les-opmerking'>" + desc.opmerking + "</span><span class='les-klas'>"+desc.klas+"</span><span class='les-tijd'>"+startdate.getHours()+":"+startdate.getMinutes()+"</span></div>");
+					}; // End for loop
+				})
+				.fail(function(data,status,err){
+					console.log( "Fail\n----\nStatus: " + status + "\nError: " + err );
+				}); // End getJSON
+		};
+
+		$(function(){
+			if(typeof Cookies.get("user") == "undefined"){
+				user = prompt("Vul je leerlingnummer in.\n\nMet het invullen ga je akkoord met het plaatsen van een cookie.");
+				if(user!=null){
+					Cookies.set( "user", user, {expires: 2190} );
+					getSchedule( user, 0 )
+				};
+			}else{
+				user = Cookies.get("user");
+				getSchedule( user, 0 )
+			};
+
+			$("#week").change(function(){
+				getSchedule( $("#user").val().toLowerCase(), $("#week option:selected").val() );
+			});
+			$("#user").keyup( function(e){
+				getSchedule( $("#user").val().toLowerCase(), $("#week option:selected").val() );
+			});
+			$("#print").click(function(){
+				$(".form").css("display", "none");
+				window.print();
+				$(".form").css("display", "block");
+			});
+		});
+	</script>
+</HEAD>
+<BODY>
+	<div class="form">
+		<label for="week">Week: </label>
+		<select name="week" id="week">
+			<option value="0">Deze week</option>
+			<option value="1">Volgende week</option>
+			<option value="2">Twee weken vooruit</option>
+		</select>
+		<label for="user">Leerlingnummer / docentcode: </label>
+		<input type="text" name="user" id="user">
+		<button id="print">Print</button>
+	</div>
+
+	<main>
+		<div class="tijd"><span>8:30</span><span>9:30</span><span>10:30</span><span>11:30</span><span>12:30</span><span>13:30</span><span>14:30</span><span>15:30</span><span>16:30</span></div>
+		<div class="dag"><span>ma</span><span>di</span><span>wo</span><span>do</span><span>vr</span></div>
+		<div class="rooster"></div>
+	</main>
+</BODY>
+</HTML>
