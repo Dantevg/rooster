@@ -1,0 +1,141 @@
+$red: #F43;
+$green: #4A5;
+$blue: #28E;
+$purple: #A4B;
+
+
+body{
+  position: relative;
+  font-family: sans-serif;
+  font-size: 11px;
+}
+
+
+h2{
+  font-size: 2.5em;
+}
+
+a{
+  color: #14A;
+  text-decoration: none;
+  &:hover{
+    text-decoration: underline;
+  }
+}
+
+.door{
+  margin-left: 10px;
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.form label{
+  margin-left: 10px;
+}
+
+.tijd{
+  float: left;
+  padding-top: 15px;
+  span{
+    display: block;
+    height: 70;
+    box-sizing: border-box;
+    border-bottom: 1px solid #000;
+    border-right: 1px solid #000;
+  }
+}
+.dag{
+  float: top;
+  padding-left: 50px;
+  span{
+    display: inline-block;
+    width: 150;
+    text-align: center;
+  }
+}
+.rooster{
+  position: relative;
+}
+.lesson{
+  position: absolute;
+  width: 150px;
+  float: right;
+  padding: 5px;
+  box-sizing: border-box;
+  border: 3px solid #FFF;
+  background-color: #DDD;
+  &:hover{
+    span.les-klas, span.les-tijd{
+      color: #000;
+    }
+    span.les-docent a{
+      color: #14A;
+    }
+  }
+}
+span.les-docent a{
+  color: #000;
+}
+span.les-klas{
+  color: #999;
+}
+span.les-tijd{
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  color: #999;
+}
+
+table{
+  border-collapse: collapse;
+  border-bottom: 1px solid #555;
+}
+tr{
+  transition: all 0.2s;
+  &:nth-child(odd){
+    background-color: #EEE;
+  }
+  &:hover{
+    background-color: #CCC;
+    td[class^="status-"], td[class*=" status-"]{
+      color: #FFF;
+    }
+    .status-deprecated{
+      background-color: $purple;
+    }
+    .status-stable{
+      background-color: $blue;
+    }
+    .status-recommended{
+      background-color: $green;
+    }
+    .status-beta{
+      background-color: $red;
+    }
+  }
+}
+th{
+  border-bottom: 2px solid #000;
+  padding: 5px 20px;
+}
+td{
+  padding: 5px 20px;
+  font-weight: bold;
+  transition: all 0.2s;
+  &:nth-of-type(2){
+    font-family: monospace;
+    font-size: 1.1em;
+  }
+  &.status-deprecated{
+    background-color: lighten($purple, 20%);
+  }
+  &.status-stable{
+    background-color: lighten($blue, 20%);
+  }
+  &.status-recommended{
+    background-color: lighten($green, 20%);
+  }
+  &.status-beta{
+    background-color: lighten($red, 20%);
+  }
+}
