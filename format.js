@@ -31,7 +31,7 @@ function format(roosterdata){
 			if( j != 0 ){ desc.docenten += ", " };
 			desc.docenten += "<a href='' onclick='getSchedule(\""
 			desc.docenten += roosterdata[i]["teachers"][j]
-			desc.docenten += "\",$(\"#week option:selected\").val()) return false'>"
+			desc.docenten += "\",$(\"#week option:selected\").val()); return false;'>"
 			desc.docenten += roosterdata[i]["teachers"][j]
 			desc.docenten += "</a>"
 		}
