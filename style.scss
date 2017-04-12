@@ -23,6 +23,11 @@ a{
   }
 }
 
+.top{
+  z-index: 10;
+}
+
+
 .door{
   margin-left: 10px;
   margin-top: 2px;
@@ -64,8 +69,9 @@ a{
   box-sizing: border-box;
   border: 3px solid #FFF;
   background-color: #DDD;
-  &:hover{
-    span.les-klas, span.les-tijd{
+  transition: all 0.3s;
+  &:hover, &.big{
+    span.les-klas, span.les-tijd, span.les-eindtijd{
       color: #000;
     }
     span.les-docent a{
@@ -76,17 +82,30 @@ a{
 .lesson.toets{
   background-color: #CCC;
 }
+.lesson.big{
+  top: 10vh !important;
+  left: 30% !important;
+  width: 40vw !important;
+  height: 40vh !important;
+  box-shadow: 0px 5px 50px -10px #000;
+  border: 0px solid transparent;
+  font-size: 14px;
+}
 span.les-docent a{
   color: #000;
 }
 span.les-klas{
   color: #999;
 }
-span.les-tijd{
+span.les-tijd, span.les-eindtijd{
   position: absolute;
   top: 5px;
   right: 5px;
   color: #999;
+}
+span.les-eindtijd{
+  top: initial;
+  bottom: 5px;
 }
 
 table{
