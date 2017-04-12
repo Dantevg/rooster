@@ -55,5 +55,10 @@ function format(roosterdata){
 		if(desc.type == "exam"){
 			$(div).addClass("toets")
 		}
+		
+		var top = $(div).css("top")
+		var left = $(div).css("left")
+		var height = $(div).css("height")
+		$("main .rooster").append("<div class='placeholder' style='top:"+top+"; left:"+left+"; height:"+height+";'></div>")
 	}
 }
