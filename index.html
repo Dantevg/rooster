@@ -8,42 +8,61 @@
 	<script src="format.js"></script>
 	<script type="text/javascript">
 		function getSchedule(user, offset){
-			if( user == "" ){ user = Cookies.get("user") };
-			if( user == "" ){ user = "0000" };
+			if( user == "" ){ user = Cookies.get("user") }
+			if( user == "" ){ user = "0000" }
 			$.getJSON( "https://citadelcollege.zportal.nl/api/v3/appointments?user=" + user + "&startWeekOffset=" + offset + "&endWeekOffset=" + (Number(offset)+1) + "&access_token=fg0ndvvhh04stm80josoimuok4" )
 				.done( function(data){
-					$("main .rooster").empty();
-					format(data["response"]["data"]);
+					$("main .rooster").empty()
+					format(data["response"]["data"])
+					$(".lesson").click(function(e){
+						e.stopPropagation()
+						var thislesson = this
+						if( $(".top").length >= 1 ){
+							$(".lesson").removeClass("big")
+							setTimeout( function(){
+								$(".lesson").removeClass("top")
+								$(thislesson).addClass("big")
+								$(thislesson).addClass("top")
+							}, 300 )
+						}else{
+							$(thislesson).addClass("big")
+							$(thislesson).addClass("top")
+						}
+					})
 				})
 				.fail(function(data,status,err){
-					console.log( "Fail\n----\nStatus: " + status + "\nError: " + err );
-				}); // End getJSON
-		};
+					console.log( "Fail\n----\nStatus: " + status + "\nError: " + err )
+				}) // End getJSON
+		}
 
 		$(function(){
 			if(typeof Cookies.get("user") == "undefined"){
-				user = prompt("Vul je leerlingnummer in.\n\nMet het invullen ga je akkoord met het plaatsen van een cookie.");
+				user = prompt("Vul je leerlingnummer in.\n\nMet het invullen ga je akkoord met het plaatsen van een cookie.")
 				if(user!=null){
-					Cookies.set( "user", user, {expires: 2190} );
+					Cookies.set( "user", user, {expires: 2190} )
 					getSchedule( user, 0 )
-				};
+				}
 			}else{
-				user = Cookies.get("user");
+				user = Cookies.get("user")
 				getSchedule( user, 0 )
-			};
+			}
 
 			$("#week").change(function(){
-				getSchedule( $("#user").val().toLowerCase(), $("#week option:selected").val() );
-			});
+				getSchedule( $("#user").val().toLowerCase(), $("#week option:selected").val() )
+			})
 			$("#user").keyup( function(e){
-				getSchedule( $("#user").val().toLowerCase(), $("#week option:selected").val() );
-			});
+				getSchedule( $("#user").val().toLowerCase(), $("#week option:selected").val() )
+			})
 			$("#print").click(function(){
-				$(".form").css("display", "none");
-				window.print();
-				$(".form").css("display", "block");
-			});
-		});
+				$(".form").css("display", "none")
+				window.print()
+				$(".form").css("display", "block")
+			})
+			$("html").click(function(){
+				$(".lesson").removeClass("big")
+				setTimeout( function(){ $(".lesson").removeClass("top") }, 300 )
+			})
+		})
 	</script>
 </HEAD>
 <BODY>
