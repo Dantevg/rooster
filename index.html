@@ -1,9 +1,9 @@
 <HTML>
 <HEAD>
 	<title>Alternatief rooster</title>
-	<link rel="stylesheet" type="text/css" href="../style.css">
+	<link rel="stylesheet" type="text/css" href="/style.css">
 
-	<script src="../cookie.min.js"></script>
+	<script src="/cookie.min.js"></script>
 	<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 	<script src="format.js"></script>
 	<script type="text/javascript">
@@ -17,6 +17,7 @@
 					$(".lesson").click(function(e){
 						e.stopPropagation()
 						var thislesson = this
+						
 						if( $(".top").length >= 1 ){
 							$(".lesson").removeClass("big")
 							setTimeout( function(){
@@ -24,10 +25,12 @@
 								$(thislesson).addClass("big")
 								$(thislesson).addClass("top")
 							}, 300 )
+							
 						}else{
 							$(thislesson).addClass("big")
 							$(thislesson).addClass("top")
 						}
+						
 					})
 				})
 				.fail(function(data,status,err){
