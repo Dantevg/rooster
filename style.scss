@@ -67,6 +67,7 @@ a{
   float: right;
   padding: 5px;
   box-sizing: border-box;
+  overflow: hidden;
   border: 3px solid #FFF;
   background-color: #DDD;
   transition: all 0.3s;
@@ -85,8 +86,8 @@ a{
 .lesson.big{
   top: 10vh !important;
   left: 30% !important;
-  width: 40vw !important;
-  height: 40vh !important;
+  width: 20vw !important;
+  height: 30vh !important;
   box-shadow: 0px 5px 50px -10px #000;
   border: 0px solid transparent;
   font-size: 14px;
@@ -106,6 +107,15 @@ span.les-tijd, span.les-eindtijd{
 span.les-eindtijd{
   top: initial;
   bottom: 5px;
+}
+
+.placeholder{
+  position: absolute;
+  width: 150px;
+  box-sizing: border-box;
+  border: 3px solid #FFF;
+  background-color: #F5F5F5;
+  z-index: -1;
 }
 
 table{
