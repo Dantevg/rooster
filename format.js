@@ -50,6 +50,7 @@ function format(roosterdata){
 		insert("les-opmerking", desc.opmerking)
 		insert("les-klas", desc.klas)
 		insert("les-tijd", startdate.getHours() + ":" + startdate.getMinutes())
+		insert("les-eindtijd", enddate.getHours() + ":" + enddate.getMinutes())
 		
 		if(desc.type == "exam"){
 			$(div).addClass("toets")
