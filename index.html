@@ -1,17 +1,58 @@
 <HTML>
 <HEAD>
-	<title>Alternatief rooster</title>
+	<title>Rooster v1.7</title>
 	<link rel="stylesheet" type="text/css" href="/style.css">
-
+	
 	<script src="/cookie.min.js"></script>
 	<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
 	<script src="format.js"></script>
 	<script type="text/javascript">
+		function checkChange(){
+			$.getJSON( "https://citadelcollege.zportal.nl/api/v3/appointments?user=" + user + "&startWeekOffset=0&endWeekOffset=2&access_token=fg0ndvvhh04stm80josoimuok4" )
+				.done(function(data){
+					var roosterdata = data["response"]["data"]
+					var lessons = [ [],[],[],[],[],[] ]
+					var change = false
+					
+					for( var i = 0; i < roosterdata.length; ++i ){
+						var startdate = new Date(roosterdata[i]["start"]*1000)
+						var day = startdate.getDay()
+						var hour = roosterdata[i]["startTimeSlot"]
+						var subject = roosterdata[i]["subjects"][0]
+						var location = roosterdata[i]["locations"][0]
+						
+						if( !(hour in lessons[day]) ){
+							lessons[day][hour] = [subject, location]
+						}else if( lessons[day][hour] == [subject, location] ){
+							lessons[day][hour] = undefined
+						}else{
+							change = true
+							$(".form").append(" Rooster is gewijzigd")
+							break
+						} // End if subject/location-check
+					} // End for
+					
+					for( var d = 0; d < lessons.length; ++d ){
+						if( change ){ break }
+						for( var h = 0; h < lessons[d].length; ++h ){
+							
+							if( lessons[d][h] != undefined ){
+								change = true
+								$(".form").append(" Rooster is gewijzigd")
+								break
+							} // End if lessons[d][h] != undefined
+							
+						} // End for h
+					} // End for d
+				}) // End getJSON
+		}
+		
 		function getSchedule(user, offset){
 			if( user == "" ){ user = Cookies.get("user") }
 			if( user == "" ){ user = "0000" }
-			$.getJSON( "https://citadelcollege.zportal.nl/api/v3/appointments?user=" + user + "&startWeekOffset=" + offset + "&endWeekOffset=" + (Number(offset)+1) + "&access_token=fg0ndvvhh04stm80josoimuok4" )
+			$.getJSON( "https://citadelcollege.zportal.nl/api/v3/appointments?user=" + user + "&startWeekOffset=" + offset + "&endWeekOffset=" + (Number(offset)+1) + "&access_token=262hj5klv2v084eifdpi65pj6d" )
 				.done( function(data){
+					console.log(data.response)
 					$("main .rooster").empty()
 					format(data["response"]["data"])
 					$(".lesson").click(function(e){
@@ -37,7 +78,7 @@
 					console.log( "Fail\n----\nStatus: " + status + "\nError: " + err )
 				}) // End getJSON
 		}
-
+		
 		$(function(){
 			if(typeof Cookies.get("user") == "undefined"){
 				user = prompt("Vul je leerlingnummer in.\n\nMet het invullen ga je akkoord met het plaatsen van een cookie.")
@@ -49,7 +90,39 @@
 				user = Cookies.get("user")
 				getSchedule( user, 0 )
 			}
-
+			checkChange()
+			$.get("../analytics.php", {user: user})
+			
+			Date.prototype.getWeek = function() {
+				var onejan = new Date(this.getFullYear(),0,1);
+				return Math.ceil((((this - onejan) / 86400000) + onejan.getDay()+1)/7);
+			}
+			
+			function formatDate(d, name){
+				var months = ["januari","februari","maart","april","mei","juni","juli","augustus","september","oktober","november","december"]
+				name += "  (" + d.getDate()
+				name += " " + months[d.getMonth()]
+				name +=  ", week " + d.getWeek() + ")"
+				return name
+			}
+			
+			var d = new Date()
+			
+			d.setDate( d.getDate() - 14 - d.getDay() + 1 )
+			$("option[value=-2]").html(formatDate(d, "Twee weken terug"))
+			var d = new Date()
+			d.setDate( d.getDate() - 7 - d.getDay() + 1 )
+			$("option[value=-1]").html(formatDate(d, "Vorige week"))
+			var d = new Date()
+			d.setDate( d.getDate() - d.getDay() + 1 )
+			$("option[value=0]").html(formatDate(d, "Deze week"))
+			var d = new Date()
+			d.setDate( d.getDate() + 7 - d.getDay() + 1 )
+			$("option[value=1]").html(formatDate(d, "Volgende week"))
+			var d = new Date()
+			d.setDate( d.getDate() + 14 - d.getDay() + 1 )
+			$("option[value=2]").html(formatDate(d, "Twee weken vooruit"))
+			
 			$("#week").change(function(){
 				getSchedule( $("#user").val().toLowerCase(), $("#week option:selected").val() )
 			})
@@ -82,7 +155,7 @@
 		<input type="text" name="user" id="user">
 		<button id="print">Print</button>
 	</div>
-
+	
 	<main>
 		<div class="tijd"><span>8:30</span><span>9:30</span><span>10:30</span><span>11:30</span><span>12:30</span><span>13:30</span><span>14:30</span><span>15:30</span><span>16:30</span></div>
 		<div class="dag"><span>ma</span><span>di</span><span>wo</span><span>do</span><span>vr</span></div>
