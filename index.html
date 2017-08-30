@@ -39,18 +39,6 @@
 							if( lessons[d][h] != undefined ){
 								change = true
 								$(".form").append(" Rooster is gewijzigd")
-								if( Cookies.get("msgDismissed") != "true" ){
-									$("#overlay").fadeIn()
-									$("body > *:not(#overlay)").css("transition", "all 0.5s")
-									$("body > *:not(#overlay)").css("filter", "blur(3px)")
-									$("#overlay").click(function(){
-										$(this).fadeOut("fast")
-										$("body > *:not(#overlay)").css("filter", "blur(0px)")
-										var d = new Date()
-										d.setDate(d.getDate() + (1+(7-d.getDay())) % 7)
-										Cookies.set( "msgDismissed", "true", {expires: d} )
-									})
-								} // End if not msgDismissed
 								break
 							} // End if lessons[d][h] != undefined
 							
@@ -64,6 +52,7 @@
 			if( user == "" ){ user = "0000" }
 			$.getJSON( "https://citadelcollege.zportal.nl/api/v3/appointments?user=" + user + "&startWeekOffset=" + offset + "&endWeekOffset=" + (Number(offset)+1) + "&access_token=262hj5klv2v084eifdpi65pj6d" )
 				.done( function(data){
+					console.log(data.response)
 					$("main .rooster").empty()
 					format(data["response"]["data"])
 					$(".lesson").click(function(e){
@@ -172,12 +161,5 @@
 		<div class="dag"><span>ma</span><span>di</span><span>wo</span><span>do</span><span>vr</span></div>
 		<div class="rooster"></div>
 	</main>
-	
-	<div id="overlay" class="hidden">
-		<div id="modal">
-			<h2>Informatie</h2>
-			Het rooster voor volgende week is veranderd.
-		</div>
-	</div>
 </BODY>
 </HTML>
