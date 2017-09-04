@@ -1,7 +1,7 @@
-function format(roosterdata){
-	function insert(cssclass, data){
+function formatLessons(roosterdata){
+	function insert(cssclass, data, change){
 		if(data != "" && data != undefined){
-			$(div).append("<span class='" + cssclass + "'>" + data + "</span><br>")
+			$(div).append("<span class='" + cssclass + (change ? " changed" : "") + "'>" + data + "</span><br>")
 		}
 	}
 	
@@ -44,8 +44,8 @@ function format(roosterdata){
 		$(div).css("left", (day-1)*150+50)
 		$(div).css("height", size*70)
 		
-		insert("les-vak", desc.vak)
-		insert("les-lokaal", desc.lokaal)
+		insert("les-vak", desc.vak, roosterdata[i].subjectChanged)
+		insert("les-lokaal", desc.lokaal, roosterdata[i].locationChanged)
 		insert("les-docent", desc.docenten)
 		insert("les-opmerking", desc.opmerking)
 		insert("les-klas", desc.klas)
@@ -61,4 +61,26 @@ function format(roosterdata){
 		var height = $(div).css("height")
 		$("main .rooster").append("<div class='placeholder' style='top:"+top+"; left:"+left+"; height:"+height+";'></div>")
 	}
+}
+
+function formatSchedule(offset){
+	$("main .rooster").empty()
+	formatLessons(lessons[offset+2])
+	$(".lesson").click(function(e){
+		e.stopPropagation()
+		var thislesson = this
+		
+		if( $(".top").length >= 1 ){
+			$(".lesson").removeClass("big")
+			setTimeout( function(){
+				$(".lesson").removeClass("top")
+				$(thislesson).addClass("big")
+				$(thislesson).addClass("top")
+			}, 300 )
+		}else{
+			$(thislesson).addClass("big")
+			$(thislesson).addClass("top")
+		}
+		
+	})
 }
