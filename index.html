@@ -1,7 +1,17 @@
 <HTML>
 	<HEAD>
-		<title>Rooster v1.7.1</title>
+		<title>Rooster</title>
 		<link rel="stylesheet" type="text/css" href="/style.css">
+		
+		<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=2">
+		<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png?v=2">
+		<link rel="icon" type="image/png" sizes="16x16" href="/icons/favicon-16x16.png?v=2">
+		<link rel="manifest" href="/icons/manifest.json?v=2">
+		<link rel="mask-icon" href="/icons/safari-pinned-tab.svg?v=2" color="#ff4444">
+		<link rel="shortcut icon" href="/icons/favicon.ico?v=2">
+		
+		<meta name="msapplication-config" content="/icons/browserconfig.xml?v=2">
+		<meta name="theme-color" content="#ff4444">
 		
 		<script src="/cookie.min.js"></script>
 		<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
@@ -9,13 +19,13 @@
 		<script type="text/javascript">
 			function checkChange(){
 				var check = function(){
-					for( var i = 0; i < lessons[ offset+2-1 ].length; i++ ){
-						var prevLesson = lessons[ offset+2-1 ][i]
-						var prevLessonDate = new Date(prevLesson.start*1000)
+					for( var i = 0; i < lessons[ offset+2 ].length; i++ ){
+						var thisLesson = lessons[ offset+2 ][i]
+						var thisLessonDate = new Date(thisLesson.start*1000)
 						
-						for( var j = 0; j < lessons[ offset+2 ].length; j++ ){
-							var thisLesson = lessons[ offset+2 ][j]
-							var thisLessonDate = new Date(thisLesson.start*1000)
+						for( var j = 0; j < lessons[ offset+2-1 ].length; j++ ){
+							var prevLesson = lessons[ offset+2-1 ][j]
+							var prevLessonDate = new Date(prevLesson.start*1000)
 							
 							// Check if same lesson
 							if( prevLessonDate.getDay() == thisLessonDate.getDay() && prevLesson.startTimeSlot == thisLesson.startTimeSlot ){
@@ -26,16 +36,17 @@
 								if( prevLesson.subjects[0] != thisLesson.subjects[0] ){
 									thisLesson.subjectChanged = true
 								}
-								if( prevLesson.locations[0] != thisLesson.locations[0] || prevLesson.subjects[0] != thisLesson.subjects[0] ){
-									break;
-								}
-							}
-						}
-					}
+								break;
+							}else if( j == lessons[ offset+2-1 ].length - 1 ){
+								thisLesson.locationChanged = true
+								thisLesson.subjectChanged = true
+							} // End if same lesson
+						} // End for thisLesson
+					} // End for prevLesson
 					formatSchedule(offset)
 				}
 				
-				if( !lessons[ offset+2-1 ] ){
+				if( !lessons[ offset+2-1 ] && offset > -2 ){
 					$.getJSON( "https://citadelcollege.zportal.nl/api/v3/appointments?user=" + user + "&startWeekOffset=" + (offset-1) + "&endWeekOffset=" + offset + "&access_token=" + token )
 					.done(function(data){
 						lessons[ offset+2-1 ] = data.response.data
@@ -44,15 +55,16 @@
 					.fail(function(){
 						formatSchedule(offset)
 					})
-				}else{
+				}else if( offset > -2 ){
 					check()
+				}else{
+					formatSchedule(offset)
 				}
-				// var thisLesson = lessons[offset+2][i]
-				// var lessonDate = new Date(thisLesson.start * 1000)
-				// lessonDate.setDate( lessonDate.getDate() - 7 )
-				// if( thisLesson.lastModified > (lessonDate.getTime() / 1000) ){
-				// 	thisLesson.changed = true
-				// }
+			}
+			
+			function switchTab(tab){
+				$("*[tab]").removeClass("active")
+				$("*[tab="+tab+"]").addClass("active")
 			}
 			
 			function getSchedule(){
@@ -67,7 +79,6 @@
 				})
 				.fail(function(data,status,err){
 					console.log( "Fail\n----\nStatus: " + status + "\nError: " + err )
-					console.log(data)
 					return false
 				}) // End getJSON
 			}
@@ -77,6 +88,8 @@
 				lessons = []
 				offset = 0
 				user = ""
+				
+				notifications = []
 				
 				if(typeof Cookies.get("user") == "undefined"){
 					user = prompt("Vul je leerlingnummer in.\n\nMet het invullen ga je akkoord met het plaatsen van een cookie.")
@@ -88,7 +101,7 @@
 					user = Cookies.get("user")
 					getSchedule()
 				}
-				$.get("../analytics.php", {user: user})
+				$.get("/analytics.php", {user: user})
 				
 				Date.prototype.getWeek = function() {
 					var onejan = new Date(this.getFullYear(),0,1);
@@ -126,12 +139,17 @@
 				})
 				$("#user").keyup( function(e){
 					user = $("#user").val()
+					lessons = []
 					getSchedule()
 				})
 				$("#print").click(function(){
 					$(".form").css("display", "none")
+					$("header").css("display", "none")
+					$(".lesson span").addClass("print")
 					window.print()
 					$(".form").css("display", "block")
+					$("header").css("display", "block")
+					$(".lesson span").removeClass("print")
 				})
 				$("html").click(function(){
 					$(".lesson").removeClass("big")
@@ -141,24 +159,51 @@
 		</script>
 	</HEAD>
 	<BODY>
-		<div class="form">
-			<label for="week">Week: </label>
-			<select name="week" id="week">
-				<option value="-2">Twee weken terug</option>
-				<option value="-1">Vorige week</option>
-				<option value="0" selected="selected">Deze week</option>
-				<option value="1">Volgende week</option>
-				<option value="2">Twee weken vooruit</option>
-			</select>
-			<label for="user">Leerlingnummer / docentcode: </label>
-			<input type="text" name="user" id="user">
-			<button id="print">Print</button>
+		<header>
+			<a class="tab active" tab="rooster" onclick="switchTab('rooster')">Rooster</a>
+			<a class="tab" tab="info" onclick="switchTab('info')">Info</a>
+			<span></span><span>v1.7.2</span>
+			<span>Door Dante van Gemert</span>
+		</header>
+		
+		<div tab="rooster" class="active">
+			<div class="form">
+				<label for="week">Week: </label>
+				<select name="week" id="week">
+					<option value="-2">Twee weken terug</option>
+					<option value="-1">Vorige week</option>
+					<option value="0" selected="selected">Deze week</option>
+					<option value="1">Volgende week</option>
+					<option value="2">Twee weken vooruit</option>
+				</select>
+				<label for="user">Leerlingnummer / docentcode: </label>
+				<input type="text" name="user" id="user">
+				<button id="print">Print</button>
+			</div>
+			
+			<main>
+				<div class="tijd"><span>8:30</span><span>9:30</span><span>10:30</span><span>11:30</span><span>12:30</span><span>13:30</span><span>14:30</span><span>15:30</span><span>16:30</span></div>
+				<div class="dag"><span>ma</span><span>di</span><span>wo</span><span>do</span><span>vr</span></div>
+				<div class="rooster"></div>
+			</main>
 		</div>
 		
-		<main>
-			<div class="tijd"><span>8:30</span><span>9:30</span><span>10:30</span><span>11:30</span><span>12:30</span><span>13:30</span><span>14:30</span><span>15:30</span><span>16:30</span></div>
-			<div class="dag"><span>ma</span><span>di</span><span>wo</span><span>do</span><span>vr</span></div>
-			<div class="rooster"></div>
-		</main>
+		<div tab="info">
+			<main>
+				<h2>Versie <code>1.7</code> <sub><sup><sub><sup>6 september 2017</sup></sub></sup></sub></h2>
+				<ul>
+					<li>Bij de weekkeuze staan nu het weeknummer en de datum van <b>de maandag in die week</b></li>
+					<li>Het vak of het lokaal worden rood als het vak of het lokaal van deze week <b>anders is dan die van de vorige week</b></li>
+					<li>Interface met versiegeschiedenis en huidige versie</li>
+					<li>Goede ondersteuning voor mobiele web-app: <a href="https://www.howtogeek.com/196087/how-to-add-websites-to-the-home-screen-on-any-smartphone-or-tablet/">kijk hier hoe je websites aan je homescherm toevoegt</a>
+				</ul>
+				
+				<h2>Versie <code>1.6</code> <sub><sup><sub><sup>12 april 2017</sup></sub></sup></sub></h2>
+				<ul>
+					<li>Lessen kunnen vergroot worden <b>door erop te klikken</b> (handig voor toetsweken)</li>
+					<li>Vorige weken zijn nu ook zichtbaar</li>
+				</ul>
+			</main>
+		</div>
 	</BODY>
 </HTML>
