@@ -5,8 +5,11 @@ function formatLessons(roosterdata){
 		}
 	}
 	
+	// get date of special days
+	var firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+	var purplefriday = new Date( new Date().getFullYear(), 11, firstDayOfMonth.getDate() + 7 + (5-firstDayOfMonth.getDay() % 7) )
+	
 	for( var i = 0; i < roosterdata.length; ++i ){
-		
 		var startdate = new Date(roosterdata[i]["start"]*1000)
 		var starttime = startdate.getHours() + startdate.getMinutes()/60
 		var enddate = new Date(roosterdata[i]["end"]*1000)
@@ -23,6 +26,8 @@ function formatLessons(roosterdata){
 		desc.lokaal = roosterdata[i]["locations"].join(", ")
 		
 		desc.opmerking = roosterdata[i].remark
+		
+		desc.veranderbericht = roosterdata[i].changeDescription
 		
 		desc.type = roosterdata[i].type
 		
@@ -51,9 +56,20 @@ function formatLessons(roosterdata){
 		insert("les-klas", desc.klas)
 		insert("les-tijd", startdate.getHours() + ":" + startdate.getMinutes())
 		insert("les-eindtijd", enddate.getHours() + ":" + enddate.getMinutes())
+		insert("les-verdanderbericht", desc.veranderbericht)
 		
 		if(desc.type == "exam"){
 			$(div).addClass("toets")
+		}
+		
+		// check for special days
+		if( startdate.getMonth() == purplefriday.getMonth() && startdate.getDate() == purplefriday.getDate() ){
+			$(div).addClass("purplefriday")
+		}
+		
+		// Check for removed lessons
+		if( roosterdata[i]["cancelled"] ){
+			$(div).addClass("cancelled")
 		}
 		
 		var top = $(div).css("top")
