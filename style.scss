@@ -154,6 +154,20 @@ main{
 .lesson.toets{
   background-color: #CCC;
 }
+.lesson.purplefriday{
+  background: $purple;
+  color: #FFF;
+  span.les-klas, span.les-tijd, span.les-eindtijd, span.les-docent a{
+    color: #FFF;
+  }
+}
+.lesson.cancelled{
+  background: #F5F5F5;
+  color: $red;
+  span.les-klas, span.les-tijd, span.les-eindtijd, span.les-docent a{
+    color: $red;
+  }
+}
 .lesson.big{
   top: 10vh !important;
   left: 30% !important;
