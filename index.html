@@ -1,7 +1,7 @@
 <HTML>
 	<HEAD>
 		<title>Rooster</title>
-		<link rel="stylesheet" type="text/css" href="/style.css">
+		<link rel="stylesheet" type="text/css" href="style.css">
 		
 		<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png?v=2">
 		<link rel="icon" type="image/png" sizes="32x32" href="/icons/favicon-32x32.png?v=2">
@@ -138,7 +138,7 @@
 					getSchedule()
 				})
 				$("#user").keyup( function(e){
-					user = $("#user").val()
+					user = $("#user").val().toLowerCase()
 					lessons = []
 					getSchedule()
 				})
