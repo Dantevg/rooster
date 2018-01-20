@@ -47,7 +47,11 @@ function getSchedule(){
 	$.getJSON( "https://citadelcollege.zportal.nl/api/v3/appointments?user=" + user + "&startWeekOffset=" + offset + "&endWeekOffset=" + (offset+1) + "&access_token=" + token )
 	.done(function(data){
 		console.log(data.response)
+		
+		Cookies.set( "offlineLessons", Date.now() )
+		localStorage.setItem( "lessons-" + new Date().getWeek(), JSON.stringify(data.response.data) )
 		lessons[ offset+2 ] = data.response.data
+		
 		checkChange()
 		return data.response.data
 	})
