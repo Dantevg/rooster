@@ -2,6 +2,7 @@ $red: #F43;
 $green: #4A5;
 $blue: #28E;
 $purple: #A4B;
+$orange: #F80;
 
 
 body{
@@ -156,6 +157,13 @@ main{
 }
 .lesson.purplefriday{
   background: $purple;
+  color: #FFF;
+  span.les-klas, span.les-tijd, span.les-eindtijd, span.les-docent a{
+    color: #FFF;
+  }
+}
+.lesson.kingsday{
+  background: $orange;
   color: #FFF;
   span.les-klas, span.les-tijd, span.les-eindtijd, span.les-docent a{
     color: #FFF;
