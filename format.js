@@ -9,6 +9,11 @@ function formatLessons(roosterdata){
 	var firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
 	var purplefriday = new Date( new Date().getFullYear(), 11, firstDayOfMonth.getDate() + 7 + (5-firstDayOfMonth.getDay() % 7) )
 	
+	var kingsday = new Date( new Date().getFullYear(), 3, 27 )
+	if( kingsday.getDay() === 0 ){
+		kingsday.setDate( kingsDay.getDate() - 1 )
+	}
+	
 	for( var i = 0; i < roosterdata.length; ++i ){
 		var startdate = new Date(roosterdata[i]["start"]*1000)
 		var starttime = startdate.getHours() + startdate.getMinutes()/60
@@ -67,6 +72,9 @@ function formatLessons(roosterdata){
 		// check for special days
 		if( startdate.getMonth() == purplefriday.getMonth() && startdate.getDate() == purplefriday.getDate() ){
 			$(div).addClass("purplefriday")
+		}
+		if( startdate.getMonth() == kingsday.getMonth() && startdate.getDate() == kingsday.getDate() ){
+			$(div).addClass("kingsday")
 		}
 		
 		// Check for removed lessons
