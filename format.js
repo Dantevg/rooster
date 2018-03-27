@@ -1,4 +1,6 @@
 function formatLessons(roosterdata){
+	var use12h = ( Cookies.get("12h") == "true" )
+	
 	function insert(cssclass, data, change){
 		if(data != "" && data != undefined){
 			$(div).append("<span class='" + cssclass + (change ? " changed" : "") + "'>" + data + "</span><br>")
@@ -48,12 +50,11 @@ function formatLessons(roosterdata){
 			desc.docenten += "</a>"
 		}
 		
-		var div = $("<div>").appendTo("main .rooster")
+		var div = $("<div>").appendTo("main .rooster .dag-"+(day-1))
 		
 		$(div).addClass("lesson")
 		
 		$(div).css("top", (starttime-8.5)*70)
-		$(div).css("left", (day-1)*150+50)
 		$(div).css("height", size*70)
 		
 		insert("les-vak", desc.vak, roosterdata[i].subjectChanged)
@@ -61,8 +62,8 @@ function formatLessons(roosterdata){
 		insert("les-docent", desc.docenten)
 		insert("les-opmerking", desc.opmerking)
 		insert("les-klas", desc.klas)
-		insert("les-tijd", startdate.getHours() + ":" + startdate.getMinutes())
-		insert("les-eindtijd", enddate.getHours() + ":" + enddate.getMinutes())
+		insert("les-tijd", startdate.toLocaleTimeString("en-US", {hour12: use12h, hour: "2-digit", minute: "2-digit"}))
+		insert("les-eindtijd", enddate.toLocaleTimeString("en-US", {hour12: use12h, hour: "2-digit", minute: "2-digit"}))
 		insert("les-verdanderbericht", desc.veranderbericht)
 		
 		if(desc.type == "exam"){
@@ -83,15 +84,16 @@ function formatLessons(roosterdata){
 		}
 		
 		var top = $(div).css("top")
-		var left = $(div).css("left")
 		var height = $(div).css("height")
-		$("main .rooster").append("<div class='placeholder' style='top:"+top+"; left:"+left+"; height:"+height+";'></div>")
+		$("main .rooster .dag-"+(day-1)).append("<div class='placeholder' style='top:"+top+"; height:"+height+";'></div>")
 	}
 }
 
-function formatSchedule(offset){
-	$("main .rooster").empty()
-	formatLessons(lessons[offset+2])
+function formatSchedule(data){
+	for( var i = 0; i < 5; i++ ){
+		$("main .rooster .dag-"+i).empty()
+	}
+	formatLessons(data)
 	$(".lesson").click(function(e){
 		e.stopPropagation()
 		var thislesson = this
