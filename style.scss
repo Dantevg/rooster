@@ -51,14 +51,14 @@ code{
 div[tab]{
   display: none;
   margin-top: 10px;
-  margin-left: 10px;
+  margin-left: 110px;
   float: left;
   max-width: calc( 100% - 110px );
 }
 div.active{
   display: block !important;
 }
-div[tab=info]{
+div[tab=info], div[tab=opties]{
   font-size: 16px;
   max-width: 700px;
   line-height: 1.3;
@@ -66,9 +66,9 @@ div[tab=info]{
 
 
 header{
+  position: fixed;
   width: 100px;
-  height: 100%;
-  float: left;
+  height: 100vh;
   padding: 20px 0px;
   box-sizing: border-box;
   background: #F44;
@@ -77,6 +77,7 @@ header{
   line-height: 40px;
   font-weight: bold;
   cursor: default;
+  z-index: 20;
   a{
     display: block;
     width: 100%;
@@ -104,6 +105,7 @@ header{
 
 main{
   margin-left: 8px;
+  white-space: nowrap;
 }
 
 
@@ -116,13 +118,13 @@ main{
   padding-top: 15px;
   span{
     display: block;
-    height: 70;
+    height: 70px;
     box-sizing: border-box;
     border-bottom: 1px solid #000;
     border-right: 1px solid #000;
   }
 }
-.dag{
+.dagnaam{
   padding-left: 50px;
   span{
     display: inline-block;
@@ -132,17 +134,30 @@ main{
 }
 .rooster{
   position: relative;
+  left: 20px;
+  min-width: 100px;
+  width: auto !important;
+  width: 100px;
+  font-size: 0px;
+}
+.dag{
+  position: relative;
+  display: inline-block;
+  width: 150px;
+  height: 645px;
 }
 .lesson{
   position: absolute;
-  width: 150px;
+  left: 0px;
+  width: 100%;
   float: right;
   padding: 5px;
   box-sizing: border-box;
   overflow: hidden;
   border: 3px solid #FFF;
-  background-color: #DDD;
-  transition: all 0.3s;
+  background-color: #EEE;
+  font-size: 11px;
+  transition: all 0.3s, color 0s;
   &:hover, &.big{
     span.les-klas, span.les-tijd, span.les-eindtijd{
       color: #000;
@@ -170,15 +185,24 @@ main{
   }
 }
 .lesson.cancelled{
-  background: #F5F5F5;
-  color: $red;
+  background: #FFF;
+  color: #CCC;
   span.les-klas, span.les-tijd, span.les-eindtijd, span.les-docent a{
-    color: $red;
+    color: #CCC;
+  }
+  &:hover, &.big{
+    color: #000;
+    span.les-klas, span.les-tijd, span.les-eindtijd, span.les-docent a{
+      color: #000;
+    }
+    span.les-docent a{
+      color: #14A;
+    }
   }
 }
 .lesson.big{
   top: 10vh !important;
-  left: 30% !important;
+  left: calc( 75px - 10vw ) !important;
   width: 20vw !important;
   height: 30vh !important;
   box-shadow: 0px 5px 50px -10px #000;
@@ -187,18 +211,19 @@ main{
 }
 span.les-vak{
   font-weight: bold;
+  font-size: 12px;
 }
 span.les-docent a{
   color: #000;
 }
 span.les-klas{
-  color: #999;
+  color: #AAA;
 }
 span.les-tijd, span.les-eindtijd{
   position: absolute;
   top: 5px;
   right: 5px;
-  color: #999;
+  color: #AAA;
 }
 span.les-eindtijd{
   top: initial;
@@ -207,63 +232,46 @@ span.les-eindtijd{
 
 .placeholder{
   position: absolute;
-  width: 150px;
+  width: 100%;
   box-sizing: border-box;
   border: 3px solid #FFF;
   background-color: #F5F5F5;
   z-index: -1;
 }
 
-table{
-  border-collapse: collapse;
-  border-bottom: 1px solid #555;
-}
-tr{
-  transition: all 0.2s;
-  &:nth-child(odd){
-    background-color: #EEE;
+.switch{
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 25px;
+  margin: 0px 8px;
+  background: #F44;
+  vertical-align: bottom;
+  input{
+    display: none;
   }
-  &:hover{
-    background-color: #CCC;
-    td[class^="status-"], td[class*=" status-"]{
-      color: #FFF;
-    }
-    .status-deprecated{
-      background-color: $purple;
-    }
-    .status-stable{
-      background-color: $blue;
-    }
-    .status-recommended{
-      background-color: $green;
-    }
-    .status-beta{
-      background-color: $red;
-    }
+  input:checked + span{
+    left: 27px;
+  }
+  span{
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 21px;
+    height: 21px;
+    background: #FFF;
+    transition: all 0.15s cubic-bezier(0.4, 0.0, 0.2, 1);
   }
 }
-th{
-  border-bottom: 2px solid #000;
-  padding: 5px 20px;
-}
-td{
-  padding: 5px 20px;
-  font-weight: bold;
-  transition: all 0.2s;
-  &:nth-of-type(2){
-    font-family: monospace;
-    font-size: 1.1em;
+
+
+
+@media screen and (orientation: portrait){
+  // Mobile device
+  .dag{
+    width: calc( 100vw - 200px );
   }
-  &.status-deprecated{
-    background-color: lighten($purple, 20%);
-  }
-  &.status-stable{
-    background-color: lighten($blue, 20%);
-  }
-  &.status-recommended{
-    background-color: lighten($green, 20%);
-  }
-  &.status-beta{
-    background-color: lighten($red, 20%);
+  .dagnaam span{
+    width: calc( 100vw - 200px );
   }
 }
