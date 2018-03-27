@@ -12,55 +12,66 @@
 	
 	<meta name="msapplication-config" content="/icons/browserconfig.xml?v=2">
 	<meta name="theme-color" content="#ff4444">
+	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
 	
 	<script src="/cookie.min.js"></script>
 	<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
+	<script src="date.js"></script>
 	<script src="format.js"></script>
 	<script src="get.js"></script>
-	<script src="date.js"></script>
 	<script type="text/javascript">
 		function switchTab(tab){
 			$("*[tab]").removeClass("active")
 			$("*[tab="+tab+"]").addClass("active")
 		}
 		
-		$(function(){
-			token = "262hj5klv2v084eifdpi65pj6d"
-			lessons = []
-			offset = 0
-			defaultUser = ""
-			user = ""
-			
-			if(typeof Cookies.get("user") == "undefined"){
-				defaultUser = prompt("Vul je leerlingnummer in.\n\nMet het invullen ga je akkoord met het plaatsen van een cookie.")
-				if(defaultUser!=null){
-					Cookies.set( "user", defaultUser, {expires: 2190} )
-				}else{
-					defaultUser = "0000"
-				}
+		token = "262hj5klv2v084eifdpi65pj6d"
+		lessons = []
+		offset = 0
+		defaultUser = ""
+		user = ""
+		
+		if(typeof Cookies.get("user") == "undefined"){
+			defaultUser = prompt("Vul je leerlingnummer in.\n\nMet het invullen ga je akkoord met het plaatsen van een cookie.")
+			if(defaultUser!=null){
+				Cookies.set( "user", defaultUser, {expires: 2190} )
 			}else{
-				defaultUser = Cookies.get("user")
+				defaultUser = "0000"
 			}
-			$.get("/analytics.php", {user: defaultUser})
-			user = defaultUser
-			getSchedule()
-			
-			var now = new Date()
+		}else{
+			defaultUser = Cookies.get("user")
+		}
+		$.get("/analytics.php", {user: defaultUser})
+		user = defaultUser
+		update()
+		
+		if( window.innerWidth < window.innerHeight ){
+			$("body").addClass("mobile")
+		}
+		
+		$(function(){
 			var d = new Date()
-			d.setDate( now.getDate() - 14 - now.getDay() + 1 )
+			
+			d.setDate( d.getDate() - 14 - d.getDay() + 1 )
 			$("option[value=-2]").html(formatDate(d, "Twee weken terug"))
-			d.setDate( now.getDate() - 7 - now.getDay() + 1 )
+			var d = new Date()
+			d.setDate( d.getDate() - 7 - d.getDay() + 1 )
 			$("option[value=-1]").html(formatDate(d, "Vorige week"))
-			d.setDate( now.getDate() - now.getDay() + 1 )
+			var d = new Date()
+			d.setDate( d.getDate() - d.getDay() + 1 )
 			$("option[value=0]").html(formatDate(d, "Deze week"))
-			d.setDate( now.getDate() + 7 - now.getDay() + 1 )
+			var d = new Date()
+			d.setDate( d.getDate() + 7 - d.getDay() + 1 )
 			$("option[value=1]").html(formatDate(d, "Volgende week"))
-			d.setDate( now.getDate() + 14 - now.getDay() + 1 )
+			var d = new Date()
+			d.setDate( d.getDate() + 14 - d.getDay() + 1 )
 			$("option[value=2]").html(formatDate(d, "Twee weken vooruit"))
+			
+			$("#12h")[0].checked = ( Cookies.get("12h") == "true" )
 			
 			$("#week").change(function(){
 				offset = Number( $("#week option:selected").val() )
-				getSchedule()
+				update()
 			})
 			$("#user").keyup(function(e){
 				user = $("#user").val().toLowerCase()
@@ -71,8 +82,17 @@
 					}
 				}
 				lessons = []
-				getSchedule()
+				update()
 			})
+			$("#12h").change(function(){
+				if( $("#12h")[0].checked ){
+					Cookies.set("12h", true, {expires: 2190})
+				}else{
+					Cookies.set("12h", false, {expires: 2190})
+				}
+				formatSchedule(lessons[offset+2])
+			})
+			
 			$("#print").click(function(){
 				$(".form").css("display", "none")
 				$("header").css("display", "none")
@@ -86,6 +106,13 @@
 				$(".lesson").removeClass("big")
 				setTimeout( function(){ $(".lesson").removeClass("top") }, 300 )
 			})
+			$(window).resize(function(){
+				if( window.innerWidth < window.innerHeight ){
+					$("body").addClass("mobile")
+				}else if( window.innerWidth > window.innerHeight ){
+					$("body").removeClass("mobile")
+				}
+			})
 		})
 	</script>
 </HEAD>
@@ -93,6 +120,7 @@
 	<header>
 		<a class="tab active" tab="rooster" onclick="switchTab('rooster')">Rooster</a>
 		<a class="tab" tab="info" onclick="switchTab('info')">Info</a>
+		<a class="tab" tab="opties" onclick="switchTab('opties')">Opties</a>
 		<span>v1.8</span>
 		<span>Door Dante van Gemert</span>
 	</header>
@@ -114,8 +142,14 @@
 		
 		<main>
 			<div class="tijd"><span>8:30</span><span>9:30</span><span>10:30</span><span>11:30</span><span>12:30</span><span>13:30</span><span>14:30</span><span>15:30</span><span>16:30</span></div>
-			<div class="dag"><span>ma</span><span>di</span><span>wo</span><span>do</span><span>vr</span></div>
-			<div class="rooster"></div>
+			<div class="dagnaam"><span>ma</span><span>di</span><span>wo</span><span>do</span><span>vr</span></div>
+			<div class="rooster">
+				<div class="dag dag-0"></div>
+				<div class="dag dag-1"></div>
+				<div class="dag dag-2"></div>
+				<div class="dag dag-3"></div>
+				<div class="dag dag-4"></div>
+			</div>
 		</main>
 	</div>
 	
@@ -136,6 +170,17 @@
 					<li>Lessen kunnen vergroot worden <b>door erop te klikken</b> (handig voor toetsweken)</li>
 					<li>Vorige weken zijn nu ook zichtbaar</li>
 				</ul>
+			</main>
+		</div>
+		
+		<div tab="opties">
+			<main>
+				24-uursklok
+				<label class="switch">
+					<input type="checkbox" name="12h" id="12h">
+					<span></span>
+				</label>
+				12-uursklok
 			</main>
 		</div>
 	</BODY>
