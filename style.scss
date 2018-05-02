@@ -12,11 +12,22 @@ body{
 }
 
 
-h2{
-  margin: 0px;
-  margin-bottom: 10px;
+h1{
+  margin: 20px 0px 10px 0px;
   font-size: 1.5em;
   color: #F44;
+  &:first-of-type{
+    margin: 0px 0px 10px 0px;
+  }
+}
+
+h2{
+  margin: 20px 0px 5px 0px;
+  font-size: 1.3em;
+  color: #F44;
+  &:first-of-type{
+    margin: 0px 0px 5px 0px;
+  }
 }
 
 a{
@@ -39,6 +50,10 @@ code{
   font-family: consolas, monospace;
 }
 
+sub, sup{
+  font-size: 0.75em;
+}
+
 .changed:not(.print){
   color: #F00;
   font-weight: bold;
@@ -58,7 +73,7 @@ div[tab]{
 div.active{
   display: block !important;
 }
-div[tab=info], div[tab=opties]{
+div[tab=info]{
   font-size: 16px;
   max-width: 700px;
   line-height: 1.3;
@@ -105,7 +120,15 @@ header{
 
 main{
   margin-left: 8px;
+}
+
+div[tab=rooster] main{
   white-space: nowrap;
+}
+
+hr{
+  border: 2px solid #DDD;
+  margin-top: 30px;
 }
 
 
@@ -209,6 +232,9 @@ main{
   border: 0px solid transparent;
   font-size: 14px;
 }
+.lesson span{
+  white-space: initial;
+}
 span.les-vak{
   font-weight: bold;
   font-size: 12px;
@@ -239,6 +265,15 @@ span.les-eindtijd{
   z-index: -1;
 }
 
+.tijdlijn{
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background: rgba(0,0,0,0.1);
+  pointer-events: none;
+  z-index: 2;
+}
+
 .switch{
   position: relative;
   display: inline-block;
@@ -246,6 +281,7 @@ span.les-eindtijd{
   height: 25px;
   margin: 0px 8px;
   background: #F44;
+  cursor: pointer;
   vertical-align: bottom;
   input{
     display: none;
@@ -266,7 +302,7 @@ span.les-eindtijd{
 
 
 
-@media screen and (orientation: portrait){
+/* @media screen and (orientation: portrait){
   // Mobile device
   .dag{
     width: calc( 100vw - 200px );
@@ -274,4 +310,4 @@ span.les-eindtijd{
   .dagnaam span{
     width: calc( 100vw - 200px );
   }
-}
+} */

@@ -1,4 +1,6 @@
+<!DOCTYPE html>
 <HTML>
+<!-- <HTML manifest="cache.appcache"> -->
 <HEAD>
 	<title>Rooster</title>
 	<link rel="stylesheet" type="text/css" href="style.css">
@@ -19,110 +21,127 @@
 	<script src="date.js"></script>
 	<script src="format.js"></script>
 	<script src="get.js"></script>
-	<script type="text/javascript">
+	<script>
+		token = "262hj5klv2v084eifdpi65pj6d"
+		version = "1.8-pre2.90"
+		
+		lessons = {}
+		locations = {}
+		classes = {}
+		names = {}
+		departments = ""
+		
+		offset = 0
+		defaultUser = ""
+		user = ""
+		
 		function switchTab(tab){
 			$("*[tab]").removeClass("active")
 			$("*[tab="+tab+"]").addClass("active")
 		}
 		
-		token = "262hj5klv2v084eifdpi65pj6d"
-		lessons = []
-		offset = 0
-		defaultUser = ""
-		user = ""
+		console.log("Version " + version)
 		
-		if(typeof Cookies.get("user") == "undefined"){
+		if( typeof Cookies.get("user") == "undefined" ){ // First time, set cookie
 			defaultUser = prompt("Vul je leerlingnummer in.\n\nMet het invullen ga je akkoord met het plaatsen van een cookie.")
-			if(defaultUser!=null){
+			if( defaultUser != null ){
 				Cookies.set( "user", defaultUser, {expires: 2190} )
 			}else{
 				defaultUser = "0000"
 			}
-		}else{
+			main()
+		}else{ // Returning user
 			defaultUser = Cookies.get("user")
-		}
-		$.get("/analytics.php", {user: defaultUser})
-		user = defaultUser
-		update()
-		
-		if( window.innerWidth < window.innerHeight ){
-			$("body").addClass("mobile")
+			main()
 		}
 		
-		$(function(){
-			var d = new Date()
+		function main(){
+			$.get("/analytics.php", {user: defaultUser})
+			user = defaultUser
+			update()
 			
-			d.setDate( d.getDate() - 14 - d.getDay() + 1 )
-			$("option[value=-2]").html(formatDate(d, "Twee weken terug"))
-			var d = new Date()
-			d.setDate( d.getDate() - 7 - d.getDay() + 1 )
-			$("option[value=-1]").html(formatDate(d, "Vorige week"))
-			var d = new Date()
-			d.setDate( d.getDate() - d.getDay() + 1 )
-			$("option[value=0]").html(formatDate(d, "Deze week"))
-			var d = new Date()
-			d.setDate( d.getDate() + 7 - d.getDay() + 1 )
-			$("option[value=1]").html(formatDate(d, "Volgende week"))
-			var d = new Date()
-			d.setDate( d.getDate() + 14 - d.getDay() + 1 )
-			$("option[value=2]").html(formatDate(d, "Twee weken vooruit"))
-			
-			$("#12h")[0].checked = ( Cookies.get("12h") == "true" )
-			
-			$("#week").change(function(){
-				offset = Number( $("#week option:selected").val() )
-				update()
-			})
-			$("#user").keyup(function(e){
-				user = $("#user").val().toLowerCase()
-				if( user == "" ){
-					user = defaultUser
+			$(function(){
+				var d = new Date()
+				d.setDate( d.getDate() - 14 - d.getDay() + 1 )
+				$("option[value=-2]").html(formatDate(d, "Twee weken terug"))
+				var d = new Date()
+				d.setDate( d.getDate() - 7 - d.getDay() + 1 )
+				$("option[value=-1]").html(formatDate(d, "Vorige week"))
+				var d = new Date()
+				d.setDate( d.getDate() - d.getDay() + 1 )
+				$("option[value=0]").html(formatDate(d, "Deze week"))
+				var d = new Date()
+				d.setDate( d.getDate() + 7 - d.getDay() + 1 )
+				$("option[value=1]").html(formatDate(d, "Volgende week"))
+				var d = new Date()
+				d.setDate( d.getDate() + 14 - d.getDay() + 1 )
+				$("option[value=2]").html(formatDate(d, "Twee weken vooruit"))
+				
+				$("#12h")[0].checked = ( Cookies.get("12h") == "true" )
+				
+				$("span.version").text("v" + version)
+				
+				$("#week").change(function(){
+					offset = Number( $("#week option:selected").val() )
+					update()
+				})
+				$("#user").on("input", function(){
+					user = $("#user").val().toLowerCase()
 					if( user == "" ){
-						user = "0000"
+						user = defaultUser
+						if( user == "" ){
+							user = "0000"
+						}
 					}
+					update()
+				})
+				$("#12h").change(function(){
+					if( $("#12h")[0].checked ){
+						Cookies.set("12h", true, {expires: 2190})
+					}else{
+						Cookies.set("12h", false, {expires: 2190})
+					}
+					formatSchedule(lessons[user][offset+2])
+				})
+				
+				$("#print").click(function(){
+					$(".form").css("display", "none")
+					$("header").css("display", "none")
+					$(".lesson span").addClass("print")
+					window.print()
+					$(".form").css("display", "block")
+					$("header").css("display", "block")
+					$(".lesson span").removeClass("print")
+				})
+				$("html").click(function(){
+					$(".lesson").removeClass("big")
+					setTimeout( function(){ $(".lesson").removeClass("top") }, 300 )
+				})
+				
+				var d = new Date()
+				var time = d.getHours() + d.getMinutes()/60
+				if( time <= 19 ){
+					$(".tijdlijn").css("top", (time-8.5)*70)
 				}
-				lessons = []
-				update()
+				
+				setInterval(function(){
+					var d = new Date()
+					var time = d.getHours() + d.getMinutes()/60
+					if( time <= 19 ){
+						$(".tijdlijn").css("top", (time-8.5)*70)
+					}
+				}, 1000)
 			})
-			$("#12h").change(function(){
-				if( $("#12h")[0].checked ){
-					Cookies.set("12h", true, {expires: 2190})
-				}else{
-					Cookies.set("12h", false, {expires: 2190})
-				}
-				formatSchedule(lessons[offset+2])
-			})
-			
-			$("#print").click(function(){
-				$(".form").css("display", "none")
-				$("header").css("display", "none")
-				$(".lesson span").addClass("print")
-				window.print()
-				$(".form").css("display", "block")
-				$("header").css("display", "block")
-				$(".lesson span").removeClass("print")
-			})
-			$("html").click(function(){
-				$(".lesson").removeClass("big")
-				setTimeout( function(){ $(".lesson").removeClass("top") }, 300 )
-			})
-			$(window).resize(function(){
-				if( window.innerWidth < window.innerHeight ){
-					$("body").addClass("mobile")
-				}else if( window.innerWidth > window.innerHeight ){
-					$("body").removeClass("mobile")
-				}
-			})
-		})
+		}
 	</script>
 </HEAD>
 <BODY>
 	<header>
 		<a class="tab active" tab="rooster" onclick="switchTab('rooster')">Rooster</a>
 		<a class="tab" tab="info" onclick="switchTab('info')">Info</a>
-		<a class="tab" tab="opties" onclick="switchTab('opties')">Opties</a>
-		<span>v1.8</span>
+		<span class="version">v1.8</span>
 		<span>Door Dante van Gemert</span>
+		<span class="offline">offline</span>
 	</header>
 	
 	<div tab="rooster" class="active">
@@ -144,6 +163,7 @@
 			<div class="tijd"><span>8:30</span><span>9:30</span><span>10:30</span><span>11:30</span><span>12:30</span><span>13:30</span><span>14:30</span><span>15:30</span><span>16:30</span></div>
 			<div class="dagnaam"><span>ma</span><span>di</span><span>wo</span><span>do</span><span>vr</span></div>
 			<div class="rooster">
+				<div class="tijdlijn"></div>
 				<div class="dag dag-0"></div>
 				<div class="dag dag-1"></div>
 				<div class="dag dag-2"></div>
@@ -155,33 +175,51 @@
 	
 	<div tab="info">
 		<main>
-			<h2>Versie <code>1.7</code> <sub><sup><sub><sup>5 december 2017</sup></sub></sup></sub></h2>
+			<h1>Opties</h1>
+			24-uursklok
+			<label class="switch">
+				<input type="checkbox" name="12h" id="12h">
+				<span></span>
+			</label>
+			12-uursklok
+			
+			<hr>
+			
+			<h1>Cookies en gegevensverzameling</h1>
+			Cookies bekijken in Google Chrome: linksboven op <code>(i) &gt; cookies</code>. Dit zijn de cookies die geplaatst worden:
+			<ul>
+				<li><code>user</code>: Zodat je niet iedere keer opnieuw hoeft in te loggen.</li>
+				<li><code>12h</code>: Of je 12-uurdklok of 24-uursklok hebt ingesteld.</li>
+			</ul>
+			Het enige wat naar mijn webserver gestuurd wordt (en dus ook het enige wat ik kan zien), is een unieke ID (dus niet je leerlingnummer), zodat ik kan zien hoeveel mensen deze site gebruiken. 
+			
+			<hr>
+			
+			<h1>Versiegeschiedenis</h1>
+			<h2>Versie <code>1.8</code> <sub><sup>8 april 2018</sup></sub></h2>
+			<ul>
+				<li>Je kunt nu ook de roosters van lokalen en klassen opzoeken</li>
+				<li>Het rooster is nu ook offline beschikbaar</li>
+				<li>Er is nu een horizontale lijn die aangeeft hoe laat het is</li>
+				<li>Nog meer speciaal gekleurde dagen toegevoegd!</li>
+			</ul>
+			
+			<h2>Versie <code>1.7</code> <sub><sup>5 december 2017</sup></sub></h2>
 			<ul>
 				<li>Lessen die vervallen, kleuren rood en de achtergrond wordt licht</li>
 				<li>Bepaalde dagen kleuren mee met de dag</li>
-				<li>Bij de weekkeuze staan nu het weeknummer en de datum van <b>de maandag in die week</b></li>
-				<li>Het vak of het lokaal worden rood als het vak of het lokaal van deze week <b>anders is dan die van de vorige week</b></li>
+				<li>Bij de weekkeuze staan nu het weeknummer en de datum van de maandag in die week</li>
+				<li>Het vak of het lokaal worden rood als het vak of het lokaal van deze week anders is dan die van de vorige week<</li>
 				<li>Interface met versiegeschiedenis en huidige versie</li>
-				<li>Goede ondersteuning voor mobiele web-app: <a href="https://www.howtogeek.com/196087/how-to-add-websites-to-the-home-screen-on-any-smartphone-or-tablet/">kijk hier hoe je websites aan je homescherm toevoegt</a>
-				</ul>
-				
-				<h2>Versie <code>1.6</code> <sub><sup><sub><sup>12 april 2017</sup></sub></sup></sub></h2>
-				<ul>
-					<li>Lessen kunnen vergroot worden <b>door erop te klikken</b> (handig voor toetsweken)</li>
-					<li>Vorige weken zijn nu ook zichtbaar</li>
-				</ul>
-			</main>
-		</div>
-		
-		<div tab="opties">
-			<main>
-				24-uursklok
-				<label class="switch">
-					<input type="checkbox" name="12h" id="12h">
-					<span></span>
-				</label>
-				12-uursklok
-			</main>
-		</div>
-	</BODY>
+				<li>Goede ondersteuning voor mobiele web-app: <a href="https://www.howtogeek.com/196087/how-to-add-websites-to-the-home-screen-on-any-smartphone-or-tablet/">kijk hier hoe je websites aan je homescherm toevoegt</a></li>
+			</ul>
+			
+			<h2>Versie <code>1.6</code> <sub><sup>12 april 2017</sup></sub></h2>
+			<ul>
+				<li>Lessen kunnen vergroot worden door erop te klikken (handig voor toetsweken)</li>
+				<li>Vorige weken zijn nu ook zichtbaar</li>
+			</ul>
+		</main>
+	</div>
+</BODY>
 </HTML>
