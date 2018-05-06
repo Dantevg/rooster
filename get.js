@@ -47,112 +47,174 @@ function formatURL(type, user, offset, token){
 		return base + "locationofbranches?schoolInSchoolYear=" + departments + "&access_token=" + token
 	}else if( type == "names" ){
 		return base + "users?fields=code,prefix,firstName,lastName&isStudent=true&schoolInSchoolYear=" + departments + "&access_token=" + token
+	}else if( type == "users" ){
+		return base + "users?fields=code&schoolInSchoolYear=" + departments + "&access_token=" + token
 	}else if( type == "departments" ){
 		return base + "schoolsinschoolyears?access_token=" + token
 	}
 }
 
-function getUserID(user, type){
-	return new Promise(function(resolve, reject){
-		if( type == "user" ){
-			resolve(user)
-		}else if( type == "class" ){
-			if( !$.isEmptyObject(classes) ){
-				resolve(classes[user])
+async function getUserID(user, type){
+	if( type == "user" ){
+		
+		if( !$.isEmptyObject(users) ){
+			if( users[user] ){
+				userName = ""
+				return user
 			}else{
-				var request = $.getJSON(formatURL("classes", undefined, undefined, token))
-				request.done(function(data){
-					var data = data.response.data
-					for( var i = 0; i < data.length; i++ ){
-						classes[data[i].name.toLowerCase()] = data[i].id
-					}
-					if( classes[user] ){
-						resolve(classes[user])
-					}
-					reject()
-				})
-				request.fail(function(){
-					reject()
-				})
+				// console.log("No such user: " + user)
+				return false
 			}
-		}else if( type == "location"){
-			if( !$.isEmptyObject(locations) ){
-				resolve(locations[user])
+		}else{
+			try{
+				var data = await $.getJSON(formatURL("users", undefined, undefined, token))
+				data = data.response.data
+				for( var i = 0; i < data.length; i++ ){
+					users[data[i].code] = true
+				}
+				if( users[user] ){
+					userName = ""
+					return user
+				}else{
+					// console.log("No such user: " + user)
+					return false
+				}
+			}catch(e){
+				console.log( new Error("Web request failed") )
+				return false
+			}
+		}
+		
+	}else if( type == "class" ){
+		
+		if( !$.isEmptyObject(classes) ){
+			return classes[user]
+		}else{
+			try{
+				var data = await $.getJSON(formatURL("classes", undefined, undefined, token))
+				data = data.response.data
+				for( var i = 0; i < data.length; i++ ){
+					classes[data[i].name.toLowerCase()] = data[i].id
+				}
+				if( classes[user] ){
+					userName = ""
+					return classes[user]
+				}else{
+					// console.log("No such user: " + user)
+					return false
+				}
+			}catch(e){
+				console.log( new Error("Web request failed") )
+				return false
+			}
+		}
+		
+	}else if( type == "location"){
+		
+		if( !$.isEmptyObject(locations) ){
+			return locations[user]
+		}else{
+			try{
+				var data = await $.getJSON(formatURL("locations", undefined, undefined, token))
+				data = data.response.data
+				for( var i = 0; i < data.length; i++ ){
+					locations[data[i].name.toLowerCase()] = data[i].id
+				}
+				if( locations[user] ){
+					userName = ""
+					return locations[user]
+				}else{
+					// console.log("No such location: " + user)
+					return false
+				}
+			}catch(e){
+				console.log( new Error("Web request failed") )
+				return false
+			}
+		}
+		
+	}else if( type == "name" ){
+		
+		if( !$.isEmptyObject(names) ){
+			var name = user.match(/[a-z]+/g)
+			if( !name ){ return false };
+			var firstName = name[0]
+			var surname = name.slice(1).join(" ")
+			// var surname = (name[1] ? name[1] : "") + (name[2] ? " "+name[2] : "")
+			if( names[firstName] ){
+				if( surname ){
+					userName = firstName + " " + surname
+					return names[firstName][surname]
+				}else{
+					userName = firstName + " " + Object.keys( names[firstName] )[0]
+					return names[firstName][ Object.keys( names[firstName] )[0] ]
+				}
 			}else{
-				var request = $.getJSON(formatURL("locations", undefined, undefined, token))
-				request.done(function(data){
-					var data = data.response.data
-					for( var i = 0; i < data.length; i++ ){
-						locations[data[i].name.toLowerCase()] = data[i].id
-					}
-					if( locations[user] ){
-						resolve(locations[user])
-					}
-					reject()
-				})
-				request.fail(function(){
-					reject()
-				})
+				// console.log("No such name: " + user)
+				return false
 			}
-		}else if( type == "name" ){
-			if( !$.isEmptyObject(names) ){
-				resolve(names[user])
-			}else{
-				var request = $.getJSON(formatURL("names", undefined, undefined, token))
-				request.done(function(data){
-					var data = data.response.data
-					for( var i = 0; i < data.length; i++ ){
-						var firstName = data[i].firstName.toLowerCase()
-						var prefix = data[i].prefix ? " "+data[i].prefix.toLowerCase() : ""
-						var lastName = data[i].lastName.toLowerCase()
-						names[ firstName+prefix+" "+lastName ] = data[i].code
-					}
-					if( names[user] ){
-						resolve(names[user])
-					}
-					reject()
-				})
-				request.fail(function(){
-					reject()
-				})
+		}else{
+			try{
+				var data = await $.getJSON(formatURL("names", undefined, undefined, token))
+				data = data.response.data
+				for( var i = 0; i < data.length; i++ ){
+					var firstName = data[i].firstName.toLowerCase()
+					var prefix = data[i].prefix ? data[i].prefix.toLowerCase()+" " : ""
+					var lastName = data[i].lastName.toLowerCase()
+					names[firstName] = names[firstName] || {}
+					names[firstName][prefix+lastName] = data[i].code
+				}
+				if( names[user] ){
+					userName = firstName + " " + prefix + lastName
+					return names[user]
+				}else{
+					// console.log("No such name: " + user)
+					return false
+				}
+			}catch(e){
+				console.log( new Error("Web request failed") )
+				return false
 			}
-		} // End if type
-	}) // End return promise
+		}
+		
+	}else{
+		
+		console.log( new Error("No such type: " + type) )
+		return false
+		
+	} // End if type
 }
 
 
-function checkChange(thisWeek){
-	return new Promise(function(resolve, reject){
-		if( offset > -2 ){
-			get(offset-1).then(function(lastWeek){
-				for( var i = 0; i < thisWeek.length; i++ ){
-					var thisLesson = thisWeek[i]
+async function checkChange(thisWeek){
+	if( offset > -2 ){
+		var lastWeek = await get(offset-1)
+		for( var i = 0; i < thisWeek.length; i++ ){
+			var thisLesson = thisWeek[i]
 
-					for( var j = 0; j < lastWeek.length; j++ ){
-						var prevLesson = lastWeek[j]
+			for( var j = 0; j < lastWeek.length; j++ ){
+				var prevLesson = lastWeek[j]
 
-						// Check if same lesson
-						if( prevLesson.startdate.getDay() == thisLesson.startdate.getDay() && prevLesson.startslot == thisLesson.startslot ){
-							// Same lesson, check if changed
-							if( prevLesson.desc.lokaal != thisLesson.desc.lokaal ){
-								thisLesson.locationChanged = true
-							}
-							if( prevLesson.vak != thisLesson.vak ){
-								thisLesson.subjectChanged = true
-							}
-							break;
-						}else if( j == lastWeek.length - 1 ){ // Not the same lesson, last option
-							thisLesson.locationChanged = true
-							thisLesson.subjectChanged = true
-						} // End if same lesson
-					} // End for prevLesson
-				} // End for thisLesson
-				resolve(thisWeek)
-			}) // End then
-		}else{
-			resolve(thisWeek)
-		}
-	})
+				// Check if same lesson
+				if( prevLesson.startdate.getDay() == thisLesson.startdate.getDay() && prevLesson.startslot == thisLesson.startslot ){
+					// Same lesson, check if changed
+					if( prevLesson.desc.lokaal != thisLesson.desc.lokaal ){
+						thisLesson.locationChanged = true
+					}
+					if( prevLesson.vak != thisLesson.vak ){
+						thisLesson.subjectChanged = true
+					}
+					break;
+				}else if( j == lastWeek.length - 1 ){ // Not the same lesson, last option
+					thisLesson.locationChanged = true
+					thisLesson.subjectChanged = true
+				} // End if same lesson
+			} // End for prevLesson
+		} // End for thisLesson
+		return thisWeek
+	}else{
+		return thisWeek
+	}
 }
 
 
@@ -196,59 +258,53 @@ function getOffline(userCode, Offset, Type){
 }
 
 
-function getOnline(userCode, Offset, Type){
+async function getOnline(userCode, Offset, Type){
 	Offset = Offset || offset
-	return new Promise(function(resolve, reject){
-		var request = $.getJSON(formatURL(Type, userCode, Offset, token))
-		request.done(function(data){
-			console.log("Loaded online schedule ("+Type+": "+user+" ("+userCode+"), week: "+Offset+")")
-			var formattedData = format(data.response.data)
-			if( userCode == defaultUser ){ // Store offline
-				localStorage.setItem( "lessons-" + (new Date().getWeek()+Offset), JSON.stringify({date: Date.now(), data: formattedData}) )
-			}
-			resolve(formattedData)
-		})
-		request.fail(function(data,status,err){
-			reject( new Error("Failed to update schedule\n----\nStatus: " + status + "\nError: " + err) )
-		})
-	})
+	
+	try{
+		var data = await $.getJSON(formatURL(Type, userCode, Offset, token))
+		var formattedData = format(data.response.data)
+		console.log("Loaded online schedule ("+Type+": "+user+" ("+userCode+") (default), week: "+Offset+")")
+		if( userCode == defaultUser ){ // Store offline
+			localStorage.setItem( "lessons-" + (new Date().getWeek()+Offset), JSON.stringify({date: Date.now(), data: formattedData}) )
+		}
+		return formattedData
+	}catch(e){
+		console.log(e.getResponseHeader("status"))
+		return false
+	}
 }
 
 
-function updateOffline(userCode, offset, type){
-	if( userCode == defaultUser ){
-		var data = getOffline(userCode, offset, type)
-		if( data ){
-			checkChange(data).then(function(data){
-				formatSchedule(data)
-				lessons[userCode] = lessons[userCode] || []
-				lessons[userCode][offset+2] = data
-			})
-			setTimeout(function(){
-				$("span.offline").css("display", "block")
-			}, 1000)
-			return true
-		}
+async function updateOffline(userCode, offset, type){
+	var data = getOffline(userCode, offset, type)
+	if( data ){
+		data = await checkChange(data)
+		formatSchedule(data)
+		lessons[userCode] = lessons[userCode] || []
+		lessons[userCode][offset+2] = data
+		
+		$("span.offline").css("display", "block")
+		return true
 	}
 	return false
 }
 
 
-function updateOnline(userCode, offset, type){
-	getOnline(userCode, offset, type).then(function(data){
-		checkChange(data).then(function(data){
-			formatSchedule(data)
-			lessons[userCode] = lessons[userCode] || []
-			lessons[userCode][offset+2] = data
-		})
-		setTimeout(function(){
-			$("span.offline").css("display", "none")
-		}, 1000)
-	}).catch(function(err){ throw err })
+async function updateOnline(userCode, offset, type){
+	var data = await getOnline(userCode, offset, type)
+	if( data ){
+		data = await checkChange(data)
+		formatSchedule(data)
+		lessons[userCode] = lessons[userCode] || []
+		lessons[userCode][offset+2] = data
+		
+		$("span.offline").css("display", "none")
+	}
 }
 
 
-function update(User, Offset){
+async function update(User, Offset){
 	user = User || user
 	offset = Offset || offset
 	
@@ -268,8 +324,8 @@ function update(User, Offset){
 	}
 	
 	if( !departments ){
-		var request = $.getJSON(formatURL("departments", undefined, undefined, token))
-		request.done(function(data){
+		try{
+			var data = await $.getJSON(formatURL("departments", undefined, undefined, token))
 			var data = data.response.data
 			var d = new Date()
 			var yearCode = d.getFullYear()
@@ -282,56 +338,90 @@ function update(User, Offset){
 				}
 			}
 			departments = departments.slice(0, -1) // Remove last ","
-		})
+		}catch(e){
+			console.log( new Error("Web request failed") )
+			return false
+		}
 	}
 	
-	getUserID(user, type).then(function(userCode){
-		if( lessons[userCode] && lessons[userCode][offset+2] ){ // Saved locally
-			formatSchedule(lessons[userCode][offset+2])
-		}else{
-			if( !updateOffline(userCode, offset, type) ){
-				updateOnline(userCode, offset, type)
+	var userCode = await getUserID(user, type)
+	showUserName(userName, type)
+	if( !userCode ){
+		// 4-long names
+		if( type == "user" && /^[a-z]{4}$/.test(user) ){
+			userCode = await getUserID(user, "name")
+			if( userCode ){
+				type = "name"
+				showUserName(userName, type)
+			}else{
+				showUserName("", type)
+				return false
 			}
+		}else{
+			showUserName("", type)
+			return false
 		}
-		
-		removeOldSchedules()
-	})
+	}
+	
+	if( lessons[userCode] && lessons[userCode][offset+2] ){ // Saved locally
+		formatSchedule(lessons[userCode][offset+2])
+		if( userCode == defaultUser && localStorage["lessons-"+(new Date().getWeek()+offset)] ){
+			$("span.offline").css("display", "block")
+		}else{
+			$("span.offline").css("display", "none")
+		}
+	}else{
+		if( !await updateOffline(userCode, offset, type) ){
+			updateOnline(userCode, offset, type)
+		}
+	}
+	
+	removeOldSchedules()
 }
 
 
-function get(offset){
-	return new Promise(function(resolve, reject){
-		
-		if( /^[a-z]+[0-9]+[a-z]*/.test(user) || user == "aula" || user == "spil" || user == "ster_a" || user == "ster_b" ){
-			type = "location"
-		}else if( /^\d{1}[a-z]{1}\d{1}/.test(user) ){
-			type = "class"
-		}else if( /^\d{3,}/.test(user) || /^[a-z]{4}/.test(user) ){
-			type = "user"
-		}else{
-			type = "name"
-		}
-		
-		getUserID(user, type).then(function(userCode){
-			
-			if( lessons[userCode] && lessons[userCode][offset+2] ){ // Saved locally
-				resolve( lessons[userCode][offset+2] )
+async function get(offset){
+	if( /^[a-z]+[0-9]+[a-z]*/.test(user) || user == "aula" || user == "spil" || user == "ster_a" || user == "ster_b" ){
+		type = "location"
+	}else if( /^\d{1}[a-z]{1}\d{1}/.test(user) ){
+		type = "class"
+	}else if( /^\d{3,}/.test(user) || /^[a-z]{4}/.test(user) ){
+		type = "user"
+	}else{
+		type = "name"
+	}
+	
+	var userCode = await getUserID(user, type)
+	if( !userCode ){
+		// 4-long names
+		if( type == "user" && /^[a-z]{4}$/.test(user) ){
+			userCode = await getUserID(user, "name")
+			if( userCode ){
+				type = "name"
 			}else{
-				lessons[userCode] = lessons[userCode] || []
-				var data = getOffline(userCode, offset, type)
-				
-				if( data ){
-					lessons[userCode][offset+2] = data
-					resolve( data )
-				}else{
-					// Get online schedule
-					getOnline(userCode, offset, type).then(function(data){
-						lessons[userCode][offset+2] = data
-						resolve( data )
-					}).catch(function(err){ throw err })
-				}
+				return false
 			}
-			
-		})
-	})
+		}else{
+			return false
+		}
+	}
+	
+	if( lessons[userCode] && lessons[userCode][offset+2] ){ // Saved locally
+		return lessons[userCode][offset+2]
+	}
+	
+	lessons[userCode] = lessons[userCode] || []
+	var data = getOffline(userCode, offset, type)
+	
+	if( data ){
+		lessons[userCode][offset+2] = data
+		return data
+	}else{
+		// Get online schedule
+		var data = await getOnline(userCode, offset, type)
+		if( data ){
+			lessons[userCode][offset+2] = data
+			return data
+		}
+	}
 }

@@ -63,12 +63,20 @@ sub, sup{
   z-index: 10;
 }
 
+.bottom{
+  position: absolute;
+  bottom: 10px;
+}
+
 div[tab]{
   display: none;
   margin-top: 10px;
   margin-left: 110px;
   float: left;
   max-width: calc( 100% - 110px );
+  &.print{
+    margin-left: 0px;
+  }
 }
 div.active{
   display: block !important;
@@ -83,7 +91,7 @@ div[tab=info]{
 header{
   position: fixed;
   width: 100px;
-  height: 100vh;
+  height: 100%;
   padding: 20px 0px;
   box-sizing: border-box;
   background: #F44;
@@ -93,7 +101,8 @@ header{
   font-weight: bold;
   cursor: default;
   z-index: 20;
-  a{
+  & > a{
+    position: relative;
     display: block;
     width: 100%;
     height: 40px;
@@ -118,6 +127,51 @@ header{
   }
 }
 
+.tab span{
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  width: 8px;
+  height: 8px;
+  padding: 0px;
+  background: transparent;
+  border-radius: 8px;
+  transition: all 0.2s;
+  &.active{
+    background: #FFF;
+  }
+}
+.tab:hover span.active{
+  background: #F44;
+}
+
+.feedbackButton a{
+  color: #FFF;
+}
+
+.feedback{
+  position: fixed;
+  bottom: -500px;
+  left: 120px;
+  width: 300px;
+  padding: 10px 15px;
+  background: #FFF;
+  border: 2px solid #F44;
+  box-shadow: 0px 2px 20px -5px #F44;
+  font-size: 16px;
+  z-index: 15;
+  transition: all 0.3s cubic-bezier(0.4, 0.0, 1, 1);
+  &.active{
+    bottom: 20px;
+    transition: all 0.3s cubic-bezier(0.0, 0.0, 0.2, 1);
+  }
+  textarea{
+    width: 100%;
+    height: 200px;
+    font-family: sans-serif;
+  }
+}
+
 main{
   margin-left: 8px;
 }
@@ -130,6 +184,25 @@ hr{
   border: 2px solid #DDD;
   margin-top: 30px;
 }
+
+
+/* .userinput{
+  position: relative;
+  display: inline;
+  .inputplaceholder{
+    position: absolute;
+    top: -2px;
+    left: 3px;
+    font-size: 13.333px;
+    color: #AAA;
+    z-index: -1;
+  }
+  input{
+    padding: 2px;
+    background: transparent;
+    border: 1px solid #AAA;
+  }
+} */
 
 
 .form label{

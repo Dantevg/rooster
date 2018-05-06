@@ -1,0 +1,12 @@
+CACHE MANIFEST
+# 1.8-pre4.1
+
+CACHE:
+index.html
+date.js
+format.js
+get.js
+style.css
+
+NETWORK:
+*

@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<HTML>
-<!-- <HTML manifest="cache.appcache"> -->
+<!-- <HTML> -->
+<HTML manifest="cache.appcache">
 <HEAD>
 	<title>Rooster</title>
 	<link rel="stylesheet" type="text/css" href="style.css">
@@ -23,9 +23,10 @@
 	<script src="get.js"></script>
 	<script>
 		token = "262hj5klv2v084eifdpi65pj6d"
-		version = "1.8-pre2.90"
+		version = "1.8-pre4.1"
 		
 		lessons = {}
+		users = {}
 		locations = {}
 		classes = {}
 		names = {}
@@ -34,10 +35,16 @@
 		offset = 0
 		defaultUser = ""
 		user = ""
+		userName = ""
 		
 		function switchTab(tab){
 			$("*[tab]").removeClass("active")
 			$("*[tab="+tab+"]").addClass("active")
+			
+			if( tab == "info" ){
+				Cookies.set( "latestVersion", version, {expires: 2190} )
+				$(".newVersion").removeClass("active")
+			}
 		}
 		
 		console.log("Version " + version)
@@ -79,6 +86,13 @@
 				
 				$("#12h")[0].checked = ( Cookies.get("12h") == "true" )
 				
+				if( !Cookies.get("latestVersion") ){
+					Cookies.set( "latestVersion", version, {expires: 2190} )
+					$(".newVersion").addClass("active")
+				}else if( Cookies.get("latestVersion") != version ){
+					$(".newVersion").addClass("active")
+				}
+				
 				$("span.version").text("v" + version)
 				
 				$("#week").change(function(){
@@ -107,15 +121,23 @@
 				$("#print").click(function(){
 					$(".form").css("display", "none")
 					$("header").css("display", "none")
+					$(".tijdlijn").css("display", "none")
 					$(".lesson span").addClass("print")
+					$("div[tab]").addClass("print")
 					window.print()
 					$(".form").css("display", "block")
 					$("header").css("display", "block")
+					$(".tijdlijn").css("display", "block")
 					$(".lesson span").removeClass("print")
+					$("div[tab]").removeClass("print")
 				})
 				$("html").click(function(){
 					$(".lesson").removeClass("big")
 					setTimeout( function(){ $(".lesson").removeClass("top") }, 300 )
+				})
+				
+				$(".feedbackButton").click(function(){
+					$(".feedback").toggleClass("active")
 				})
 				
 				var d = new Date()
@@ -138,11 +160,18 @@
 <BODY>
 	<header>
 		<a class="tab active" tab="rooster" onclick="switchTab('rooster')">Rooster</a>
-		<a class="tab" tab="info" onclick="switchTab('info')">Info</a>
+		<a class="tab" tab="info" onclick="switchTab('info')">Info <span class="newVersion"></span></a>
 		<span class="version">v1.8</span>
 		<span>Door Dante van Gemert</span>
 		<span class="offline">offline</span>
+		<span class="feedbackButton bottom"><a>feedback</a></span>
 	</header>
+	
+	<div class="feedback">
+		<h2>Feedback</h2>
+		Heb je een fout ontdekt? Een nieuwe functie die je graag zou willen zien? Of gewoon een vraag?<br>
+		Alles kan. Stuur me gewoon een mailtje: <a href="mailto:mail@rooster.dantevg.nl">mail@rooster.dantevg.nl</a>
+	</div>
 	
 	<div tab="rooster" class="active">
 		<div class="form">
@@ -154,9 +183,10 @@
 				<option value="1">Volgende week</option>
 				<option value="2">Twee weken vooruit</option>
 			</select>
-			<label for="user">Leerlingnummer / docentcode: </label>
-			<input type="text" name="user" id="user">
+			<label for="user">Rooster van: </label>
+			<input type="text" name="user" id="user" title="leerlingnummer, docentcode, lokaal, klas, naam">
 			<button id="print">Print</button>
+			<span class="userName"></span>
 		</div>
 		
 		<main>
@@ -189,18 +219,21 @@
 			Cookies bekijken in Google Chrome: linksboven op <code>(i) &gt; cookies</code>. Dit zijn de cookies die geplaatst worden:
 			<ul>
 				<li><code>user</code>: Zodat je niet iedere keer opnieuw hoeft in te loggen.</li>
-				<li><code>12h</code>: Of je 12-uurdklok of 24-uursklok hebt ingesteld.</li>
+				<li><code>12h</code>: Of je 12-uursklok of 24-uursklok hebt ingesteld.</li>
+				<li><code>latestVersion</code>: Bij welke versie je het laatst hier hebt gekeken.</li>
 			</ul>
 			Het enige wat naar mijn webserver gestuurd wordt (en dus ook het enige wat ik kan zien), is een unieke ID (dus niet je leerlingnummer), zodat ik kan zien hoeveel mensen deze site gebruiken. 
 			
 			<hr>
 			
 			<h1>Versiegeschiedenis</h1>
-			<h2>Versie <code>1.8</code> <sub><sup>8 april 2018</sup></sub></h2>
+			<h2>Versie <code>1.8</code> <sub><sup>6 mei 2018</sup></sub></h2>
 			<ul>
-				<li>Je kunt nu ook de roosters van lokalen en klassen opzoeken</li>
+				<li>Je kunt nu ook lokalen, klassen en namen opzoeken</li>
 				<li>Het rooster is nu ook offline beschikbaar</li>
 				<li>Er is nu een horizontale lijn die aangeeft hoe laat het is</li>
+				<li>Bij een nieuwe update verschijnt er een puntje in de zijbalk</li>
+				<li>Contact- en feedbackinformatie toegevoegd</li>
 				<li>Nog meer speciaal gekleurde dagen toegevoegd!</li>
 			</ul>
 			
