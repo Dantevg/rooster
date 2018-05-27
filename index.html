@@ -132,6 +132,18 @@
 				var d = new Date()
 				d.setDate( d.getDate() + 14 - d.getDay() + 1 )
 				$("option[value=2]").html(formatDate(d, "Twee weken vooruit"))
+				var d = new Date()
+				d.setDate( d.getDate() + 21 - d.getDay() + 1 )
+				$("option[value=3]").html(formatDate(d, "Drie weken vooruit"))
+				var d = new Date()
+				d.setDate( d.getDate() + 28 - d.getDay() + 1 )
+				$("option[value=4]").html(formatDate(d, "Vier weken vooruit"))
+				var d = new Date()
+				d.setDate( d.getDate() + 35 - d.getDay() + 1 )
+				$("option[value=5]").html(formatDate(d, "Vijf weken vooruit"))
+				var d = new Date()
+				d.setDate( d.getDate() + 42 - d.getDay() + 1 )
+				$("option[value=6]").html(formatDate(d, "Zes weken vooruit"))
 				
 				$("#week").change(function(){
 					offset = Number( $("#week option:selected").val() )
@@ -162,7 +174,7 @@
 		<header>
 			<a class="tab active" tab="rooster" onclick="switchTab('rooster')">Rooster</a>
 			<a class="tab" tab="info" onclick="switchTab('info')">Info</a>
-			<span></span><span>v1.7.3</span>
+			<span></span><span>v1.7.4</span>
 			<span>Door Dante van Gemert</span>
 		</header>
 		
@@ -175,6 +187,10 @@
 					<option value="0" selected="selected">Deze week</option>
 					<option value="1">Volgende week</option>
 					<option value="2">Twee weken vooruit</option>
+					<option value="3">Drie weken vooruit</option>
+					<option value="4">Vier weken vooruit</option>
+					<option value="5">Vijf weken vooruit</option>
+					<option value="6">Zes weken vooruit</option>
 				</select>
 				<label for="user">Leerlingnummer / docentcode: </label>
 				<input type="text" name="user" id="user">
@@ -190,12 +206,13 @@
 		
 		<div tab="info">
 			<main>
-				<h2>Versie <code>1.7</code> <sub><sup><sub><sup>5 december 2017</sup></sub></sup></sub></h2>
+				<h2>Versie <code>1.7</code> <sub><sup><sub><sup>5 december 2017, update: 25 mei 2018</sup></sub></sup></sub></h2>
 				<ul>
 					<li>Lessen die vervallen, kleuren rood en de achtergrond wordt licht</li>
 					<li>Bepaalde dagen kleuren mee met de dag</li>
 					<li>Bij de weekkeuze staan nu het weeknummer en de datum van <b>de maandag in die week</b></li>
 					<li>Het vak of het lokaal worden rood als het vak of het lokaal van deze week <b>anders is dan die van de vorige week</b></li>
+					<li>Tot zes weken vooruit kijken</li>
 					<li>Interface met versiegeschiedenis en huidige versie</li>
 					<li>Goede ondersteuning voor mobiele web-app: <a href="https://www.howtogeek.com/196087/how-to-add-websites-to-the-home-screen-on-any-smartphone-or-tablet/">kijk hier hoe je websites aan je homescherm toevoegt</a>
 				</ul>
