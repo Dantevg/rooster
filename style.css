@@ -1,94 +1,88 @@
-$red: #F43;
-$green: #4A5;
-$blue: #28E;
-$purple: #A4B;
-$orange: #F80;
-
-
-body{
+body {
   margin: 0px;
   font-family: sans-serif;
   font-size: 11px;
 }
 
-
-h1{
+h1 {
   margin: 20px 0px 10px 0px;
   font-size: 1.5em;
   color: #F44;
-  &:first-of-type{
-    margin: 0px 0px 10px 0px;
-  }
+}
+h1:first-of-type {
+  margin: 0px 0px 10px 0px;
 }
 
-h2{
+h2 {
   margin: 20px 0px 5px 0px;
   font-size: 1.3em;
   color: #F44;
-  &:first-of-type{
-    margin: 0px 0px 5px 0px;
-  }
+}
+h2:first-of-type {
+  margin: 0px 0px 5px 0px;
 }
 
-a{
+a {
   color: #14A;
   text-decoration: none;
-  &:hover{
-    text-decoration: underline;
-  }
+}
+a:hover {
+  text-decoration: underline;
 }
 
-ul{
+ul {
   margin: 5px;
   margin-bottom: 20px;
 }
-li{
+
+li {
   margin-bottom: 8px;
 }
 
-code{
+code {
   font-family: consolas, monospace;
 }
 
-sub, sup{
+sub, sup {
   font-size: 0.75em;
 }
 
-.changed:not(.print){
+.changed:not(.print) {
   color: #F00;
   font-weight: bold;
 }
 
-.top{
+.top {
   z-index: 10;
 }
 
-.bottom{
+.bottom {
   position: absolute;
   bottom: 10px;
 }
 
-div[tab]{
+div[tab] {
   display: none;
   margin-top: 10px;
   margin-left: 110px;
   float: left;
   max-width: calc( 100% - 110px );
-  &.print{
-    margin-left: 0px;
-  }
 }
-div.active{
+div[tab].print {
+  margin-left: 0px;
+}
+
+div.active {
   display: block !important;
 }
-div[tab=info]{
+
+div[tab=info] {
   font-size: 16px;
   max-width: 700px;
   line-height: 1.3;
 }
 
-
-#overlay{
+#overlay {
   display: flex;
   position: fixed;
   top: 0px;
@@ -97,22 +91,21 @@ div[tab=info]{
   height: 100%;
   justify-content: center;
   align-items: center;
-  background: rgba(#000, 0.3);
+  background: rgba(0, 0, 0, 0.3);
   opacity: 0;
   z-index: -10;
   transition: opacity 0.3s, z-index 0.3s ease 0.3s;
-  &.visible{
-    opacity: 1;
-    z-index: 30;
-  }
-  #modal{
-    padding: 30px 50px;
-    background: #FFF;
-  }
+}
+#overlay.visible {
+  opacity: 1;
+  z-index: 30;
+}
+#overlay #modal {
+  padding: 30px 50px;
+  background: #FFF;
 }
 
-
-header{
+header {
   position: fixed;
   width: 100px;
   height: 100%;
@@ -125,33 +118,33 @@ header{
   font-weight: bold;
   cursor: default;
   z-index: 20;
-  & > a{
-    position: relative;
-    display: block;
-    width: 100%;
-    height: 40px;
-    padding: 0px 20px;
-    box-sizing: border-box;
-    background: rgba(#FFF, 0.2);
-    color: inherit;
-    font-size: 1.2em;
-    transition: all 0.2s;
-    &:hover, &.active{
-      background: #FFF;
-      color: #F44;
-      text-decoration: none;
-    }
-  }
-  span{
-    display: block;
-    width: 100%;
-    padding: 10px 20px 10px 10px;
-    box-sizing: border-box;
-    line-height: 1.5em;
-  }
+}
+header > a {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 40px;
+  padding: 0px 20px;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.2);
+  color: inherit;
+  font-size: 1.2em;
+  transition: all 0.2s;
+}
+header > a:hover, header > a.active {
+  background: #FFF;
+  color: #F44;
+  text-decoration: none;
+}
+header span {
+  display: block;
+  width: 100%;
+  padding: 10px 20px 10px 10px;
+  box-sizing: border-box;
+  line-height: 1.5em;
 }
 
-.tab span{
+.tab span {
   position: absolute;
   top: 16px;
   left: 16px;
@@ -161,19 +154,20 @@ header{
   background: transparent;
   border-radius: 8px;
   transition: all 0.2s;
-  &.active{
-    background: #FFF;
-  }
 }
-.tab:hover span.active{
+.tab span.active {
+  background: #FFF;
+}
+
+.tab:hover span.active {
   background: #F44;
 }
 
-.feedbackButton a{
+.feedbackButton a {
   color: #FFF;
 }
 
-.feedback{
+.feedback {
   position: fixed;
   bottom: -500px;
   left: 120px;
@@ -184,31 +178,30 @@ header{
   box-shadow: 0px 2px 20px -5px #F44;
   font-size: 16px;
   z-index: 15;
-  transition: all 0.3s cubic-bezier(0.4, 0.0, 1, 1);
-  &.active{
-    bottom: 20px;
-    transition: all 0.3s cubic-bezier(0.0, 0.0, 0.2, 1);
-  }
-  textarea{
-    width: 100%;
-    height: 200px;
-    font-family: sans-serif;
-  }
+  transition: all 0.3s cubic-bezier(0.4, 0, 1, 1);
+}
+.feedback.active {
+  bottom: 20px;
+  transition: all 0.3s cubic-bezier(0, 0, 0.2, 1);
+}
+.feedback textarea {
+  width: 100%;
+  height: 200px;
+  font-family: sans-serif;
 }
 
-main{
+main {
   margin-left: 8px;
 }
 
-div[tab=rooster] main{
+div[tab=rooster] main {
   white-space: nowrap;
 }
 
-hr{
+hr {
   border: 2px solid #DDD;
   margin-top: 30px;
 }
-
 
 /* .userinput{
   position: relative;
@@ -227,35 +220,36 @@ hr{
     border: 1px solid #AAA;
   }
 } */
-
-
-.form label{
+.form label {
   margin-left: 10px;
 }
 
-.tijd12, .tijd24{
+.tijd12, .tijd24 {
   float: left;
   padding-top: 15px;
-  span{
-    display: block;
-    height: 70px;
-    box-sizing: border-box;
-    border-bottom: 1px solid #000;
-    border-right: 1px solid #000;
-  }
 }
-.tijd12{
+.tijd12 span, .tijd24 span {
+  display: block;
+  height: 70px;
+  box-sizing: border-box;
+  border-bottom: 1px solid #000;
+  border-right: 1px solid #000;
+}
+
+.tijd12 {
   display: none;
 }
-.dagnaam{
+
+.dagnaam {
   padding-left: 50px;
-  span{
-    display: inline-block;
-    width: 150px;
-    text-align: center;
-  }
 }
-.rooster{
+.dagnaam span {
+  display: inline-block;
+  width: 150px;
+  text-align: center;
+}
+
+.rooster {
   position: relative;
   left: 20px;
   min-width: 100px;
@@ -263,13 +257,15 @@ hr{
   width: 100px;
   font-size: 0px;
 }
-.dag{
+
+.dag {
   position: relative;
   display: inline-block;
   width: 150px;
   height: 645px;
 }
-.lesson{
+
+.lesson {
   position: absolute;
   left: 0px;
   width: 100%;
@@ -281,49 +277,52 @@ hr{
   background-color: #EEE;
   font-size: 11px;
   transition: all 0.3s, color 0s;
-  &:hover, &.big{
-    span.les-klas, span.les-tijd, span.les-eindtijd{
-      color: #000;
-    }
-    span.les-docent a{
-      color: #14A;
-    }
-  }
 }
-.lesson.toets{
+.lesson:hover span.les-klas, .lesson:hover span.les-tijd, .lesson:hover span.les-eindtijd, .lesson.big span.les-klas, .lesson.big span.les-tijd, .lesson.big span.les-eindtijd {
+  color: #000;
+}
+.lesson:hover span.les-docent a, .lesson.big span.les-docent a {
+  color: #14A;
+}
+
+.lesson.toets {
   background-color: #CCC;
 }
-.lesson.purplefriday{
-  background: $purple;
+
+.lesson.purplefriday {
+  background: #A4B;
   color: #FFF;
-  span.les-klas, span.les-tijd, span.les-eindtijd, span.les-docent a{
-    color: #FFF;
-  }
 }
-.lesson.kingsday{
-  background: $orange;
+.lesson.purplefriday span.les-klas, .lesson.purplefriday span.les-tijd, .lesson.purplefriday span.les-eindtijd, .lesson.purplefriday span.les-docent a {
   color: #FFF;
-  span.les-klas, span.les-tijd, span.les-eindtijd, span.les-docent a{
-    color: #FFF;
-  }
 }
-.lesson.cancelled{
+
+.lesson.kingsday {
+  background: #F80;
+  color: #FFF;
+}
+.lesson.kingsday span.les-klas, .lesson.kingsday span.les-tijd, .lesson.kingsday span.les-eindtijd, .lesson.kingsday span.les-docent a {
+  color: #FFF;
+}
+
+.lesson.cancelled {
   background: #FFF;
   color: #CCC;
-  span.les-klas, span.les-tijd, span.les-eindtijd, span.les-docent a{
-    color: #CCC;
-  }
-  &:hover, &.big{
-    color: #000;
-    span.les-klas, span.les-tijd, span.les-eindtijd, span.les-docent a{
-      color: #000;
-    }
-    span.les-docent a{
-      color: #14A;
-    }
-  }
 }
-.lesson.big{
+.lesson.cancelled span.les-klas, .lesson.cancelled span.les-tijd, .lesson.cancelled span.les-eindtijd, .lesson.cancelled span.les-docent a {
+  color: #CCC;
+}
+.lesson.cancelled:hover, .lesson.cancelled.big {
+  color: #000;
+}
+.lesson.cancelled:hover span.les-klas, .lesson.cancelled:hover span.les-tijd, .lesson.cancelled:hover span.les-eindtijd, .lesson.cancelled:hover span.les-docent a, .lesson.cancelled.big span.les-klas, .lesson.cancelled.big span.les-tijd, .lesson.cancelled.big span.les-eindtijd, .lesson.cancelled.big span.les-docent a {
+  color: #000;
+}
+.lesson.cancelled:hover span.les-docent a, .lesson.cancelled.big span.les-docent a {
+  color: #14A;
+}
+
+.lesson.big {
   top: 10vh !important;
   left: calc( 75px - 10vw ) !important;
   width: 20vw !important;
@@ -331,35 +330,41 @@ hr{
   box-shadow: 0px 5px 50px -10px #000;
   border: 0px solid transparent;
   font-size: 14px;
-  span.les-vak{
-    font-size: 16px;
-  }
 }
-.lesson span{
+.lesson.big span.les-vak {
+  font-size: 16px;
+}
+
+.lesson span {
   white-space: initial;
 }
-span.les-vak{
+
+span.les-vak {
   font-weight: bold;
   font-size: 12px;
 }
-span.les-docent a{
+
+span.les-docent a {
   color: #000;
 }
-span.les-klas{
+
+span.les-klas {
   color: #AAA;
 }
-span.les-tijd, span.les-eindtijd{
+
+span.les-tijd, span.les-eindtijd {
   position: absolute;
   top: 5px;
   right: 5px;
   color: #AAA;
 }
-span.les-eindtijd{
+
+span.les-eindtijd {
   top: initial;
   bottom: 5px;
 }
 
-.placeholder{
+.placeholder {
   position: absolute;
   width: 100%;
   box-sizing: border-box;
@@ -368,16 +373,16 @@ span.les-eindtijd{
   z-index: -1;
 }
 
-.tijdlijn{
+.tijdlijn {
   position: absolute;
   width: 100%;
   height: 6px;
-  background: rgba(0,0,0,0.15);
+  background: rgba(0, 0, 0, 0.15);
   pointer-events: none;
   z-index: 2;
 }
 
-.switch{
+.switch {
   position: relative;
   display: inline-block;
   width: 50px;
@@ -386,24 +391,22 @@ span.les-eindtijd{
   background: #F44;
   cursor: pointer;
   vertical-align: bottom;
-  input{
-    display: none;
-  }
-  input:checked + span{
-    left: 27px;
-  }
-  span{
-    position: absolute;
-    top: 2px;
-    left: 2px;
-    width: 21px;
-    height: 21px;
-    background: #FFF;
-    transition: all 0.15s cubic-bezier(0.4, 0.0, 0.2, 1);
-  }
 }
-
-
+.switch input {
+  display: none;
+}
+.switch input:checked + span {
+  left: 27px;
+}
+.switch span {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 21px;
+  height: 21px;
+  background: #FFF;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
 /* @media screen and (orientation: portrait){
   // Mobile device

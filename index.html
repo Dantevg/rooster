@@ -14,7 +14,7 @@
 	
 	<meta name="msapplication-config" content="/icons/browserconfig.xml?v=2">
 	<meta name="theme-color" content="#ff4444">
-	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	
 	<script src="/cookie.min.js"></script>
 	<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
@@ -23,19 +23,18 @@
 	<script src="get.js"></script>
 	<script>
 		token = "262hj5klv2v084eifdpi65pj6d"
-		version = "1.8-pre4.1"
+		version = "1.8-pre5.57"
 		
 		lessons = {}
 		users = {}
-		locations = {}
-		classes = {}
-		names = {}
 		departments = ""
 		
-		offset = 0
 		defaultUser = ""
-		user = ""
-		userName = ""
+		options = {
+			offset: 0,
+			input: "",
+			scheduleFor: undefined
+		}
 		
 		function switchTab(tab){
 			$("*[tab]").removeClass("active")
@@ -47,114 +46,130 @@
 			}
 		}
 		
+		function updateTimeline(){
+			var d = new Date()
+			var time = d.getHours() + d.getMinutes()/60
+			if( time <= 19 ){
+				$(".tijdlijn").css("top", (time-8.5)*70 - 3)
+			}else{
+				$(".tijdlijn").css("top", -50)
+			}
+		}
+		
 		console.log("Version " + version)
 		
-		if( typeof Cookies.get("user") == "undefined" ){ // First time, set cookie
-			defaultUser = prompt("Vul je leerlingnummer in.\n\nMet het invullen ga je akkoord met het plaatsen van een cookie.")
-			if( defaultUser != null ){
-				Cookies.set( "user", defaultUser, {expires: 2190} )
-			}else{
-				defaultUser = "0000"
-			}
-			main()
-		}else{ // Returning user
-			defaultUser = Cookies.get("user")
-			main()
+		
+		async function main(){
+			$.get("/analytics.php", {user: defaultUser})
+			await getDepartments()
+			options.scheduleFor = await getUser(defaultUser)
+			showUserName(options)
+			update(options)
 		}
 		
-		function main(){
-			$.get("/analytics.php", {user: defaultUser})
-			user = defaultUser
-			update()
+		
+		$(function(){
+			var weekNames = [
+			"Twee weken terug",
+			"Vorige week",
+			"Deze week",
+			"Volgende week",
+			"Twee weken vooruit",
+			"Drie weken vooruit",
+			"Vier weken vooruit",
+			"Vijf weken vooruit",
+			"Zes weken vooruit",
+			]
+			for( var i = -2; i <= 6; i++ ){
+				var d = new Date()
+				d.setDate( d.getDate() + (7*i) - d.getDay() + 1 )
+				$("option[value="+i+"]").html(formatDate(d, weekNames[i+2]))
+			}
 			
-			$(function(){
-				var d = new Date()
-				d.setDate( d.getDate() - 14 - d.getDay() + 1 )
-				$("option[value=-2]").html(formatDate(d, "Twee weken terug"))
-				var d = new Date()
-				d.setDate( d.getDate() - 7 - d.getDay() + 1 )
-				$("option[value=-1]").html(formatDate(d, "Vorige week"))
-				var d = new Date()
-				d.setDate( d.getDate() - d.getDay() + 1 )
-				$("option[value=0]").html(formatDate(d, "Deze week"))
-				var d = new Date()
-				d.setDate( d.getDate() + 7 - d.getDay() + 1 )
-				$("option[value=1]").html(formatDate(d, "Volgende week"))
-				var d = new Date()
-				d.setDate( d.getDate() + 14 - d.getDay() + 1 )
-				$("option[value=2]").html(formatDate(d, "Twee weken vooruit"))
-				
-				$("#12h")[0].checked = ( Cookies.get("12h") == "true" )
-				
-				if( !Cookies.get("latestVersion") ){
-					Cookies.set( "latestVersion", version, {expires: 2190} )
-					$(".newVersion").addClass("active")
-				}else if( Cookies.get("latestVersion") != version ){
-					$(".newVersion").addClass("active")
-				}
-				
-				$("span.version").text("v" + version)
-				
-				$("#week").change(function(){
-					offset = Number( $("#week option:selected").val() )
-					update()
-				})
-				$("#user").on("input", function(){
-					user = $("#user").val().toLowerCase()
-					if( user == "" ){
-						user = defaultUser
-						if( user == "" ){
-							user = "0000"
-						}
-					}
-					update()
-				})
-				$("#12h").change(function(){
-					if( $("#12h")[0].checked ){
-						Cookies.set("12h", true, {expires: 2190})
-					}else{
-						Cookies.set("12h", false, {expires: 2190})
-					}
-					formatSchedule(lessons[user][offset+2])
-				})
-				
-				$("#print").click(function(){
-					$(".form").css("display", "none")
-					$("header").css("display", "none")
-					$(".tijdlijn").css("display", "none")
-					$(".lesson span").addClass("print")
-					$("div[tab]").addClass("print")
-					window.print()
-					$(".form").css("display", "block")
-					$("header").css("display", "block")
-					$(".tijdlijn").css("display", "block")
-					$(".lesson span").removeClass("print")
-					$("div[tab]").removeClass("print")
-				})
-				$("html").click(function(){
-					$(".lesson").removeClass("big")
-					setTimeout( function(){ $(".lesson").removeClass("top") }, 300 )
-				})
-				
-				$(".feedbackButton").click(function(){
-					$(".feedback").toggleClass("active")
-				})
-				
-				var d = new Date()
-				var time = d.getHours() + d.getMinutes()/60
-				if( time <= 19 ){
-					$(".tijdlijn").css("top", (time-8.5)*70)
-				}
-				
-				setInterval(function(){
-					var d = new Date()
-					var time = d.getHours() + d.getMinutes()/60
-					if( time <= 19 ){
-						$(".tijdlijn").css("top", (time-8.5)*70)
-					}
-				}, 1000)
+			if( Cookies.get("12h") == "true" ){
+				$("#12h")[0].checked = true
+				$(".tijd24").css("display", "none")
+				$(".tijd12").css("display", "block")
+			}
+			
+			if( !Cookies.get("latestVersion") ){
+				Cookies.set( "latestVersion", version, {expires: 2190} )
+				$(".newVersion").addClass("active")
+			}else if( Cookies.get("latestVersion") != version ){
+				$(".newVersion").addClass("active")
+			}
+			
+			$("span.version").text("v" + version)
+			
+			$("#week").change(function(){
+				options.offset = Number( $("#week option:selected").val() )
+				update(options)
 			})
-		}
+			$("#user").on("input", function(){
+				options.input = $("#user").val().toLowerCase()
+				getUser(options.input).then(function(scheduleFor){
+					if( options.scheduleFor != scheduleFor ){ // Change
+						options.scheduleFor = scheduleFor
+						update(options)
+						showUserName(options)
+					}
+				})
+			})
+			$("#12h").change(function(){
+				if( $("#12h")[0].checked ){
+					Cookies.set("12h", true, {expires: 2190})
+					$(".tijd24").css("display", "none")
+					$(".tijd12").css("display", "block")
+				}else{
+					Cookies.set("12h", false, {expires: 2190})
+					$(".tijd24").css("display", "block")
+					$(".tijd12").css("display", "none")
+				}
+				formatSchedule(lessons[options.scheduleFor.id][options.offset+2])
+			})
+			
+			$("#print").click(function(){
+				$(".form").css("display", "none")
+				$("header").css("display", "none")
+				$(".tijdlijn").css("display", "none")
+				$(".lesson span").addClass("print")
+				$("div[tab]").addClass("print")
+				window.print()
+				$(".form").css("display", "block")
+				$("header").css("display", "block")
+				$(".tijdlijn").css("display", "block")
+				$(".lesson span").removeClass("print")
+				$("div[tab]").removeClass("print")
+			})
+			$("html").click(function(){
+				$(".lesson").removeClass("big")
+				setTimeout( function(){ $(".lesson").removeClass("top") }, 300 )
+			})
+			
+			$(".feedbackButton").click(function(){
+				$(".feedback").toggleClass("active")
+			})
+			
+			updateTimeline()
+			setInterval(updateTimeline, 1000)
+			
+			if( typeof Cookies.get("user") == "undefined" ){ // First time, set cookie
+				$("#overlay").addClass("visible")
+				$("button.submitDefaultUser").click(function(){
+					defaultUser = $("#defaultUser").val()
+					$("#overlay").removeClass("visible")
+					if( defaultUser ){
+						Cookies.set( "user", defaultUser, {expires: 2190} )
+					}else{
+						defaultUser = "0000"
+					}
+					main()
+				})
+			}else{ // Returning user
+				defaultUser = Cookies.get("user")
+				main()
+			}
+		})
 	</script>
 </HEAD>
 <BODY>
@@ -182,6 +197,10 @@
 				<option value="0" selected="selected">Deze week</option>
 				<option value="1">Volgende week</option>
 				<option value="2">Twee weken vooruit</option>
+				<option value="3">Drie weken vooruit</option>
+				<option value="4">Vier weken vooruit</option>
+				<option value="5">Vijf weken vooruit</option>
+				<option value="6">Zes weken vooruit</option>
 			</select>
 			<label for="user">Rooster van: </label>
 			<input type="text" name="user" id="user" title="leerlingnummer, docentcode, lokaal, klas, naam">
@@ -190,7 +209,8 @@
 		</div>
 		
 		<main>
-			<div class="tijd"><span>8:30</span><span>9:30</span><span>10:30</span><span>11:30</span><span>12:30</span><span>13:30</span><span>14:30</span><span>15:30</span><span>16:30</span></div>
+			<div class="tijd24"><span>8:30</span><span>9:30</span><span>10:30</span><span>11:30</span><span>12:30</span><span>13:30</span><span>14:30</span><span>15:30</span><span>16:30</span></div>
+			<div class="tijd12"><span>8:30 AM</span><span>9:30 AM</span><span>10:30 AM</span><span>11:30 AM</span><span>12:30 PM</span><span>1:30 PM</span><span>2:30 PM</span><span>3:30 PM</span><span>4:30 PM</span></div>
 			<div class="dagnaam"><span>ma</span><span>di</span><span>wo</span><span>do</span><span>vr</span></div>
 			<div class="rooster">
 				<div class="tijdlijn"></div>
@@ -215,34 +235,45 @@
 			
 			<hr>
 			
-			<h1>Cookies en gegevensverzameling</h1>
-			Cookies bekijken in Google Chrome: linksboven op <code>(i) &gt; cookies</code>. Dit zijn de cookies die geplaatst worden:
+			<h1>Cookies, lokale opslag en gegevensverzameling</h1>
+			<p>
+				Cookies bekijken in Google Chrome: linksboven op <code>(i) &gt; cookies &gt; rooster.dantevg.nl &gt; Cookies</code>. Dit zijn de cookies die geplaatst worden:
+			</p>
 			<ul>
 				<li><code>user</code>: Zodat je niet iedere keer opnieuw hoeft in te loggen.</li>
 				<li><code>12h</code>: Of je 12-uursklok of 24-uursklok hebt ingesteld.</li>
 				<li><code>latestVersion</code>: Bij welke versie je het laatst hier hebt gekeken.</li>
 			</ul>
-			Het enige wat naar mijn webserver gestuurd wordt (en dus ook het enige wat ik kan zien), is een unieke ID (dus niet je leerlingnummer), zodat ik kan zien hoeveel mensen deze site gebruiken. 
+			<p>
+				Om je rooster ook offline te kunnen bekijken, wordt de hele pagina offline opgeslagen (<code>Applicatiecaches</code>). Ook wordt de informatie van het rooster zelf opgeslagen (<code>Lokale opslag</code>).
+			</p><p>
+				Het enige wat naar mijn webserver gestuurd wordt (en dus ook het enige wat ik kan zien), is een unieke ID (dus niet je leerlingnummer), zodat ik kan zien hoeveel mensen deze site gebruiken.
+			</p>
 			
 			<hr>
 			
 			<h1>Versiegeschiedenis</h1>
-			<h2>Versie <code>1.8</code> <sub><sup>6 mei 2018</sup></sub></h2>
+			<h2>Versie <code>1.8</code> <sub><sup>1 juni 2018</sup></sub></h2>
 			<ul>
 				<li>Je kunt nu ook lokalen, klassen en namen opzoeken</li>
 				<li>Het rooster is nu ook offline beschikbaar</li>
+				<li>De naam van wie het rooster is wordt nu weergegeven</li>
 				<li>Er is nu een horizontale lijn die aangeeft hoe laat het is</li>
+				<li>Je kunt nu ook 12-uursklok gebruiken!</li>
 				<li>Bij een nieuwe update verschijnt er een puntje in de zijbalk</li>
 				<li>Contact- en feedbackinformatie toegevoegd</li>
+				<li>Nu over HTTPS!</li>
 				<li>Nog meer speciaal gekleurde dagen toegevoegd!</li>
+				<li>Interne code is herschreven en nu effici&euml;nter</li>
 			</ul>
 			
-			<h2>Versie <code>1.7</code> <sub><sup>5 december 2017</sup></sub></h2>
+			<h2>Versie <code>1.7</code> <sub><sup>5 december 2017, update: 25 mei 2018</sup></sub></h2>
 			<ul>
 				<li>Lessen die vervallen, kleuren rood en de achtergrond wordt licht</li>
 				<li>Bepaalde dagen kleuren mee met de dag</li>
 				<li>Bij de weekkeuze staan nu het weeknummer en de datum van de maandag in die week</li>
-				<li>Het vak of het lokaal worden rood als het vak of het lokaal van deze week anders is dan die van de vorige week<</li>
+				<li>Het vak of het lokaal worden rood als het vak of het lokaal van deze week anders is dan die van de vorige week</li>
+				<li>Tot zes weken vooruit kijken</li>
 				<li>Interface met versiegeschiedenis en huidige versie</li>
 				<li>Goede ondersteuning voor mobiele web-app: <a href="https://www.howtogeek.com/196087/how-to-add-websites-to-the-home-screen-on-any-smartphone-or-tablet/">kijk hier hoe je websites aan je homescherm toevoegt</a></li>
 			</ul>
@@ -253,6 +284,15 @@
 				<li>Vorige weken zijn nu ook zichtbaar</li>
 			</ul>
 		</main>
+	</div>
+	
+	<div id="overlay">
+		<div id="modal">
+			<h1>Vul je leerlingnummer in</h1>
+			<p>Met het invullen ga je akkoord met het plaatsen van cookies, alleen gebruikt door deze website.</p>
+			<input type="text" name="defaultUser" id="defaultUser">
+			<button class="submitDefaultUser">Verder</button>
+		</div>
 	</div>
 </BODY>
 </HTML>
