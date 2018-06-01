@@ -25,6 +25,7 @@ h2:first-of-type {
 a {
   color: #14A;
   text-decoration: none;
+  cursor: pointer;
 }
 a:hover {
   text-decoration: underline;
@@ -47,8 +48,8 @@ sub, sup {
   font-size: 0.75em;
 }
 
-.changed:not(.print) {
-  color: #F00;
+.les-vak.changed:not(.print), .les-lokaal.changed:not(.print) a {
+  color: #F00 !important;
   font-weight: bold;
 }
 
@@ -105,6 +106,40 @@ div[tab=info] {
   background: #FFF;
 }
 
+#lesson-overlay {
+  position: fixed;
+  width: 100vw;
+  height: 50vh;
+  top: calc( -50vh - 20px );
+  left: 0px;
+  padding: 20px;
+  box-sizing: border-box;
+  background: #FFF;
+  box-shadow: 0px 5px 20px 0px rgba(0, 0, 0, 0.3);
+  font-size: 16px;
+  transition: all 0.3s;
+  z-index: 20;
+}
+#lesson-overlay.active {
+  top: 0px;
+}
+#lesson-overlay span {
+  font-size: 16px;
+}
+#lesson-overlay span.les-tijd {
+  top: 20px;
+  right: 20px;
+  color: #000;
+}
+#lesson-overlay span.les-eindtijd {
+  bottom: 20px;
+  right: 20px;
+  color: #000;
+}
+#lesson-overlay span a {
+  color: #14A;
+}
+
 header {
   position: fixed;
   width: 100px;
@@ -119,6 +154,9 @@ header {
   cursor: default;
   z-index: 20;
 }
+header a {
+  color: #FFF;
+}
 header > a {
   position: relative;
   display: block;
@@ -126,6 +164,7 @@ header > a {
   height: 40px;
   padding: 0px 20px;
   box-sizing: border-box;
+  cursor: default;
   background: rgba(255, 255, 255, 0.2);
   color: inherit;
   font-size: 1.2em;
@@ -161,10 +200,6 @@ header span {
 
 .tab:hover span.active {
   background: #F44;
-}
-
-.feedbackButton a {
-  color: #FFF;
 }
 
 .feedback {
@@ -203,23 +238,6 @@ hr {
   margin-top: 30px;
 }
 
-/* .userinput{
-  position: relative;
-  display: inline;
-  .inputplaceholder{
-    position: absolute;
-    top: -2px;
-    left: 3px;
-    font-size: 13.333px;
-    color: #AAA;
-    z-index: -1;
-  }
-  input{
-    padding: 2px;
-    background: transparent;
-    border: 1px solid #AAA;
-  }
-} */
 .form label {
   margin-left: 10px;
 }
@@ -241,7 +259,7 @@ hr {
 }
 
 .dagnaam {
-  padding-left: 50px;
+  padding-left: 60px;
 }
 .dagnaam span {
   display: inline-block;
@@ -251,7 +269,7 @@ hr {
 
 .rooster {
   position: relative;
-  left: 20px;
+  left: 10px;
   min-width: 100px;
   width: auto !important;
   width: 100px;
@@ -269,7 +287,6 @@ hr {
   position: absolute;
   left: 0px;
   width: 100%;
-  float: right;
   padding: 5px;
   box-sizing: border-box;
   overflow: hidden;
@@ -278,10 +295,27 @@ hr {
   font-size: 11px;
   transition: all 0.3s, color 0s;
 }
-.lesson:hover span.les-klas, .lesson:hover span.les-tijd, .lesson:hover span.les-eindtijd, .lesson.big span.les-klas, .lesson.big span.les-tijd, .lesson.big span.les-eindtijd {
+.lesson:hover span.les-tijd, .lesson:hover span.les-eindtijd, .lesson.big span.les-tijd, .lesson.big span.les-eindtijd {
   color: #000;
 }
-.lesson:hover span.les-docent a, .lesson.big span.les-docent a {
+.lesson:hover span a, .lesson.big span a {
+  color: #14A;
+}
+
+.lesson.cancelled {
+  background: #FFF;
+  color: #CCC;
+}
+.lesson.cancelled span.les-lokaal a, .lesson.cancelled span.les-docent a, .lesson.cancelled span.les-klas a, .lesson.cancelled span.les-tijd, .lesson.cancelled span.les-eindtijd {
+  color: #CCC;
+}
+.lesson.cancelled:hover, .lesson.cancelled.big {
+  color: #000;
+}
+.lesson.cancelled:hover span.les-tijd, .lesson.cancelled:hover span.les-eindtijd, .lesson.cancelled.big span.les-tijd, .lesson.cancelled.big span.les-eindtijd {
+  color: #000;
+}
+.lesson.cancelled:hover span a, .lesson.cancelled.big span a {
   color: #14A;
 }
 
@@ -293,7 +327,7 @@ hr {
   background: #A4B;
   color: #FFF;
 }
-.lesson.purplefriday span.les-klas, .lesson.purplefriday span.les-tijd, .lesson.purplefriday span.les-eindtijd, .lesson.purplefriday span.les-docent a {
+.lesson.purplefriday span.les-klas a, .lesson.purplefriday span.les-tijd, .lesson.purplefriday span.les-eindtijd, .lesson.purplefriday span.les-docent a {
   color: #FFF;
 }
 
@@ -301,25 +335,8 @@ hr {
   background: #F80;
   color: #FFF;
 }
-.lesson.kingsday span.les-klas, .lesson.kingsday span.les-tijd, .lesson.kingsday span.les-eindtijd, .lesson.kingsday span.les-docent a {
+.lesson.kingsday span.les-klas a, .lesson.kingsday span.les-tijd, .lesson.kingsday span.les-eindtijd, .lesson.kingsday span.les-docent a {
   color: #FFF;
-}
-
-.lesson.cancelled {
-  background: #FFF;
-  color: #CCC;
-}
-.lesson.cancelled span.les-klas, .lesson.cancelled span.les-tijd, .lesson.cancelled span.les-eindtijd, .lesson.cancelled span.les-docent a {
-  color: #CCC;
-}
-.lesson.cancelled:hover, .lesson.cancelled.big {
-  color: #000;
-}
-.lesson.cancelled:hover span.les-klas, .lesson.cancelled:hover span.les-tijd, .lesson.cancelled:hover span.les-eindtijd, .lesson.cancelled:hover span.les-docent a, .lesson.cancelled.big span.les-klas, .lesson.cancelled.big span.les-tijd, .lesson.cancelled.big span.les-eindtijd, .lesson.cancelled.big span.les-docent a {
-  color: #000;
-}
-.lesson.cancelled:hover span.les-docent a, .lesson.cancelled.big span.les-docent a {
-  color: #14A;
 }
 
 .lesson.big {
@@ -329,26 +346,30 @@ hr {
   height: 30vh !important;
   box-shadow: 0px 5px 50px -10px #000;
   border: 0px solid transparent;
+}
+.lesson.big span {
   font-size: 14px;
 }
 .lesson.big span.les-vak {
   font-size: 16px;
 }
 
-.lesson span {
-  white-space: initial;
-}
-
 span.les-vak {
   font-weight: bold;
   font-size: 12px;
+  transition: all 0.3s;
 }
 
-span.les-docent a {
+span.les-lokaal a, span.les-docent a {
   color: #000;
+  transition: all 0.3s;
 }
 
-span.les-klas {
+span.les-klas a {
+  color: #CCC;
+  transition: all 0.3s;
+}
+span.les-klas a.print {
   color: #AAA;
 }
 
@@ -356,6 +377,10 @@ span.les-tijd, span.les-eindtijd {
   position: absolute;
   top: 5px;
   right: 5px;
+  color: #CCC;
+  transition: all 0.3s;
+}
+span.les-tijd.print, span.les-eindtijd.print {
   color: #AAA;
 }
 
@@ -408,6 +433,29 @@ span.les-eindtijd {
   transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+@media screen and (orientation: portrait) {
+  #overlay {
+    align-items: flex-start;
+  }
+  #overlay #modal {
+    width: 100%;
+  }
+
+  .lesson.big {
+    top: 10vh !important;
+    left: calc( 75px - 10vw ) !important;
+    width: 20vw !important;
+    height: 30vh !important;
+    box-shadow: 0px 5px 50px -10px #000;
+    border: 0px solid transparent;
+  }
+  .lesson.big span {
+    font-size: 14px;
+  }
+  .lesson.big span.les-vak {
+    font-size: 16px;
+  }
+}
 /* @media screen and (orientation: portrait){
   // Mobile device
   .dag{

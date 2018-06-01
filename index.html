@@ -23,7 +23,7 @@
 	<script src="get.js"></script>
 	<script>
 		token = "262hj5klv2v084eifdpi65pj6d"
-		version = "1.8-pre5.57"
+		version = "1.8-pre6.3"
 		
 		lessons = {}
 		users = {}
@@ -49,9 +49,9 @@
 		function updateTimeline(){
 			var d = new Date()
 			var time = d.getHours() + d.getMinutes()/60
-			if( time <= 19 ){
+			if( time <= 19 ){ // Within bounds
 				$(".tijdlijn").css("top", (time-8.5)*70 - 3)
-			}else{
+			}else{ // Outside bounds, disable
 				$(".tijdlijn").css("top", -50)
 			}
 		}
@@ -80,6 +80,7 @@
 			"Vijf weken vooruit",
 			"Zes weken vooruit",
 			]
+			
 			for( var i = -2; i <= 6; i++ ){
 				var d = new Date()
 				d.setDate( d.getDate() + (7*i) - d.getDay() + 1 )
@@ -141,8 +142,9 @@
 				$(".lesson span").removeClass("print")
 				$("div[tab]").removeClass("print")
 			})
-			$("html").click(function(){
+			$("html, #lesson-overlay").click(function(){
 				$(".lesson").removeClass("big")
+				$("#lesson-overlay").removeClass("active")
 				setTimeout( function(){ $(".lesson").removeClass("top") }, 300 )
 			})
 			
@@ -151,7 +153,7 @@
 			})
 			
 			updateTimeline()
-			setInterval(updateTimeline, 1000)
+			setInterval(updateTimeline, 1000) // Every second
 			
 			if( typeof Cookies.get("user") == "undefined" ){ // First time, set cookie
 				$("#overlay").addClass("visible")
@@ -159,7 +161,7 @@
 					defaultUser = $("#defaultUser").val()
 					$("#overlay").removeClass("visible")
 					if( defaultUser ){
-						Cookies.set( "user", defaultUser, {expires: 2190} )
+						Cookies.set( "user", defaultUser, {expires: 2190} ) // Expires in 6 years
 					}else{
 						defaultUser = "0000"
 					}
@@ -179,6 +181,7 @@
 		<span class="version">v1.8</span>
 		<span>Door Dante van Gemert</span>
 		<span class="offline">offline</span>
+		<span class="update" onclick="updateOnline(options)"><a>update</a></span> <!-- Display: flex? -->
 		<span class="feedbackButton bottom"><a>feedback</a></span>
 	</header>
 	
@@ -221,6 +224,8 @@
 				<div class="dag dag-4"></div>
 			</div>
 		</main>
+		
+		<div id="lesson-overlay"></div>
 	</div>
 	
 	<div tab="info">
@@ -256,9 +261,10 @@
 			<h2>Versie <code>1.8</code> <sub><sup>1 juni 2018</sup></sub></h2>
 			<ul>
 				<li>Je kunt nu ook lokalen, klassen en namen opzoeken</li>
-				<li>Het rooster is nu ook offline beschikbaar</li>
+				<li>Het rooster is nu ook offline beschikbaar, klik links op "update" om handmatig te updaten</li>
 				<li>De naam van wie het rooster is wordt nu weergegeven</li>
 				<li>Er is nu een horizontale lijn die aangeeft hoe laat het is</li>
+				<li>Mobiele versie verbeterd</li>
 				<li>Je kunt nu ook 12-uursklok gebruiken!</li>
 				<li>Bij een nieuwe update verschijnt er een puntje in de zijbalk</li>
 				<li>Contact- en feedbackinformatie toegevoegd</li>
@@ -290,8 +296,10 @@
 		<div id="modal">
 			<h1>Vul je leerlingnummer in</h1>
 			<p>Met het invullen ga je akkoord met het plaatsen van cookies, alleen gebruikt door deze website.</p>
-			<input type="text" name="defaultUser" id="defaultUser">
-			<button class="submitDefaultUser">Verder</button>
+			<form onsubmit="return false">
+				<input type="text" name="defaultUser" id="defaultUser">
+				<button class="submitDefaultUser">Verder</button>
+			</form>
 		</div>
 	</div>
 </BODY>

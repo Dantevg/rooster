@@ -1,4 +1,13 @@
 function Lesson(data){
+	var join = function(data){
+		var output = ""
+		for( var i = 0; i < data.length; i++ ){
+			if( i != 0 ){ output += ", " };
+			output += "<a>" + data[i] + "</a>"
+		}
+		return output
+	}
+	
 	this.startdate = new Date(data.start * 1000)
 	this.starttime = this.startdate.getHours() + this.startdate.getMinutes() / 60
 	this.startslot = data.startTimeSlot
@@ -12,17 +21,12 @@ function Lesson(data){
 	
 	this.desc = {}
 	this.desc.vak = data.subjects.join(", ")
-	this.desc.klas = data.groups.join(", ")
-	this.desc.lokaal = data.locations.join(", ")
+	this.desc.klas = join(data.groups)
+	this.desc.docent = join(data.teachers)
+	this.desc.lokaal = join(data.locations)
 	this.desc.opmerking = data.remark
 	this.desc.veranderbericht = data.changeDescription
 	this.desc.type = data.type
-	
-	this.desc.docenten = ""
-	for( var i = 0; i < data.teachers.length; i++ ){
-		if( i != 0 ){ this.desc.docenten += ", " };
-		this.desc.docenten += "<a href>" + data.teachers[i] + "</a>"
-	}
 	
 	this.cancelled = data.cancelled
 	this.locationChanged = false
@@ -60,6 +64,7 @@ function formatDataURL(type){
 async function getUser(input){
 	input = (typeof input == "string") ? input.toLowerCase() : ""
 	if( input == "" ){
+		// Invalid input
 		return await getUser(defaultUser)
 	}
 	
@@ -213,7 +218,6 @@ async function getDepartments(){
 	}
 }
 
-// TODO: Fix
 async function checkChange(thisWeek, options){
 	if( options.offset <= -2 ){
 		return thisWeek
@@ -275,7 +279,7 @@ function getOffline(options){
 		var offline = localStorage["lessons-"+(new Date().getWeek()+options.offset)]
 		if( offline != undefined ){
 			var data = JSON.parse(offline)
-			if( data.date + 3600000 > Date.now() ){
+			if( data.date + 43200000 > Date.now() ){ // 12 Hours
 				console.log("Loaded offline schedule ("+options.scheduleFor.type+": "+options.scheduleFor.name+" ("+options.scheduleFor.id+") (default), week: "+options.offset+")")
 				data = data.data
 				for( var i = 0; i < data.length; i++ ){
@@ -335,7 +339,7 @@ async function updateOnline(options){
 
 
 async function update(options){
-	if( !options.scheduleFor ){
+	if( !options || !options.scheduleFor ){
 		return false
 	}
 	if( lessons[options.scheduleFor.id] && lessons[options.scheduleFor.id][options.offset+2] ){ // Saved locally
@@ -353,6 +357,7 @@ async function update(options){
 	
 	removeOldSchedules()
 }
+
 
 
 async function get(options){
