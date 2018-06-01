@@ -33,6 +33,7 @@ h2{
 a{
   color: #14A;
   text-decoration: none;
+  cursor: pointer;
   &:hover{
     text-decoration: underline;
   }
@@ -54,8 +55,8 @@ sub, sup{
   font-size: 0.75em;
 }
 
-.changed:not(.print){
-  color: #F00;
+.les-vak.changed:not(.print), .les-lokaal.changed:not(.print) a{
+  color: #F00 !important;
   font-weight: bold;
 }
 
@@ -112,6 +113,41 @@ div[tab=info]{
 }
 
 
+#lesson-overlay{
+  position: fixed;
+  width: 100vw;
+  height: 50vh;
+  top: calc( -50vh - 20px );
+  left: 0px;
+  padding: 20px;
+  box-sizing: border-box;
+  background: #FFF;
+  box-shadow: 0px 5px 20px 0px rgba(#000, 0.3);
+  font-size: 16px;
+  transition: all 0.3s;
+  z-index: 20;
+  &.active{
+    top: 0px;
+  }
+  span{
+    font-size: 16px;
+  }
+  span.les-tijd{
+    top: 20px;
+    right: 20px;
+    color: #000;
+  }
+  span.les-eindtijd{
+    bottom: 20px;
+    right: 20px;
+    color: #000;
+  }
+  span a{
+    color: #14A;
+  }
+}
+
+
 header{
   position: fixed;
   width: 100px;
@@ -125,6 +161,9 @@ header{
   font-weight: bold;
   cursor: default;
   z-index: 20;
+  a{
+    color: #FFF;
+  }
   & > a{
     position: relative;
     display: block;
@@ -132,6 +171,7 @@ header{
     height: 40px;
     padding: 0px 20px;
     box-sizing: border-box;
+    cursor: default;
     background: rgba(#FFF, 0.2);
     color: inherit;
     font-size: 1.2em;
@@ -167,10 +207,6 @@ header{
 }
 .tab:hover span.active{
   background: #F44;
-}
-
-.feedbackButton a{
-  color: #FFF;
 }
 
 .feedback{
@@ -209,26 +245,6 @@ hr{
   margin-top: 30px;
 }
 
-
-/* .userinput{
-  position: relative;
-  display: inline;
-  .inputplaceholder{
-    position: absolute;
-    top: -2px;
-    left: 3px;
-    font-size: 13.333px;
-    color: #AAA;
-    z-index: -1;
-  }
-  input{
-    padding: 2px;
-    background: transparent;
-    border: 1px solid #AAA;
-  }
-} */
-
-
 .form label{
   margin-left: 10px;
 }
@@ -248,7 +264,7 @@ hr{
   display: none;
 }
 .dagnaam{
-  padding-left: 50px;
+  padding-left: 60px;
   span{
     display: inline-block;
     width: 150px;
@@ -257,7 +273,7 @@ hr{
 }
 .rooster{
   position: relative;
-  left: 20px;
+  left: 10px;
   min-width: 100px;
   width: auto !important;
   width: 100px;
@@ -269,11 +285,11 @@ hr{
   width: 150px;
   height: 645px;
 }
+
 .lesson{
   position: absolute;
   left: 0px;
   width: 100%;
-  float: right;
   padding: 5px;
   box-sizing: border-box;
   overflow: hidden;
@@ -282,45 +298,46 @@ hr{
   font-size: 11px;
   transition: all 0.3s, color 0s;
   &:hover, &.big{
-    span.les-klas, span.les-tijd, span.les-eindtijd{
+    span.les-tijd, span.les-eindtijd{
       color: #000;
     }
-    span.les-docent a{
+    span a{
       color: #14A;
     }
   }
 }
+.lesson.cancelled{
+  background: #FFF;
+  color: #CCC;
+  span.les-lokaal a, span.les-docent a, span.les-klas a, span.les-tijd, span.les-eindtijd{
+    color: #CCC;
+  }
+  &:hover, &.big{
+    color: #000;
+    span.les-tijd, span.les-eindtijd{
+      color: #000;
+    }
+    span a{
+      color: #14A;
+    }
+  }
+}
+
 .lesson.toets{
   background-color: #CCC;
 }
 .lesson.purplefriday{
   background: $purple;
   color: #FFF;
-  span.les-klas, span.les-tijd, span.les-eindtijd, span.les-docent a{
+  span.les-klas a, span.les-tijd, span.les-eindtijd, span.les-docent a{
     color: #FFF;
   }
 }
 .lesson.kingsday{
   background: $orange;
   color: #FFF;
-  span.les-klas, span.les-tijd, span.les-eindtijd, span.les-docent a{
+  span.les-klas a, span.les-tijd, span.les-eindtijd, span.les-docent a{
     color: #FFF;
-  }
-}
-.lesson.cancelled{
-  background: #FFF;
-  color: #CCC;
-  span.les-klas, span.les-tijd, span.les-eindtijd, span.les-docent a{
-    color: #CCC;
-  }
-  &:hover, &.big{
-    color: #000;
-    span.les-klas, span.les-tijd, span.les-eindtijd, span.les-docent a{
-      color: #000;
-    }
-    span.les-docent a{
-      color: #14A;
-    }
   }
 }
 .lesson.big{
@@ -330,29 +347,38 @@ hr{
   height: 30vh !important;
   box-shadow: 0px 5px 50px -10px #000;
   border: 0px solid transparent;
-  font-size: 14px;
+  span{
+    font-size: 14px;
+  }
   span.les-vak{
     font-size: 16px;
   }
 }
-.lesson span{
-  white-space: initial;
-}
 span.les-vak{
   font-weight: bold;
   font-size: 12px;
+  transition: all 0.3s;
 }
-span.les-docent a{
+span.les-lokaal a, span.les-docent a{
   color: #000;
+  transition: all 0.3s;
 }
-span.les-klas{
-  color: #AAA;
+span.les-klas a{
+  color: #CCC;
+  transition: all 0.3s;
+  &.print{
+    color: #AAA;
+  }
 }
 span.les-tijd, span.les-eindtijd{
   position: absolute;
   top: 5px;
   right: 5px;
-  color: #AAA;
+  color: #CCC;
+  transition: all 0.3s;
+  &.print{
+    color: #AAA;
+  }
 }
 span.les-eindtijd{
   top: initial;
@@ -405,12 +431,27 @@ span.les-eindtijd{
 
 
 
-/* @media screen and (orientation: portrait){
+@media screen and (orientation: portrait){
   // Mobile device
-  .dag{
-    width: calc( 100vw - 200px );
+  #overlay{
+    align-items: flex-start;
+    #modal{
+      width: 100%;
+    }
   }
-  .dagnaam span{
-    width: calc( 100vw - 200px );
+  
+  .lesson.big{
+    top: 10vh !important;
+    left: calc( 75px - 10vw ) !important;
+    width: 20vw !important;
+    height: 30vh !important;
+    box-shadow: 0px 5px 50px -10px #000;
+    border: 0px solid transparent;
+    span{
+      font-size: 14px;
+    }
+    span.les-vak{
+      font-size: 16px;
+    }
   }
-} */
+}
