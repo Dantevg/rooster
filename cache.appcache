@@ -1,0 +1,14 @@
+CACHE MANIFEST
+# 1.8
+
+CACHE:
+index.html
+date.js
+format.js
+get.js
+style.css
+https://rooster.dantevg.nl/cookie.min.js
+https://code.jquery.com/jquery-2.2.4.min.js
+
+NETWORK:
+*
