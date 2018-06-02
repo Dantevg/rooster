@@ -358,8 +358,6 @@ async function update(options){
 	removeOldSchedules()
 }
 
-
-
 async function get(options){
 	if( lessons[options.scheduleFor.id] && lessons[options.scheduleFor.id][options.offset+2] ){ // Saved locally
 		return lessons[options.scheduleFor.id][options.offset+2]

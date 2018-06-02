@@ -296,7 +296,8 @@ hr{
   border: 3px solid #FFF;
   background-color: #EEE;
   font-size: 11px;
-  transition: all 0.3s, color 0s;
+  white-space: normal;
+  transition: all 0.4s, top 0.3s, color 0s;
   &:hover, &.big{
     span.les-tijd, span.les-eindtijd{
       color: #000;
@@ -347,6 +348,7 @@ hr{
   height: 30vh !important;
   box-shadow: 0px 5px 50px -10px #000;
   border: 0px solid transparent;
+  transition: all 0.3s, top 0.4s;
   span{
     font-size: 14px;
   }
@@ -396,7 +398,8 @@ span.les-eindtijd{
 
 .tijdlijn{
   position: absolute;
-  width: 100%;
+  left: -10px;
+  width: calc( 100vw - 195px );
   height: 6px;
   background: rgba(0,0,0,0.15);
   pointer-events: none;

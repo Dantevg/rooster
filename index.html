@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- <HTML> -->
 <HTML manifest="cache.appcache">
 <HEAD>
 	<title>Rooster</title>
@@ -14,7 +13,7 @@
 	
 	<meta name="msapplication-config" content="/icons/browserconfig.xml?v=2">
 	<meta name="theme-color" content="#ff4444">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width">
 	
 	<script src="/cookie.min.js"></script>
 	<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
@@ -23,7 +22,7 @@
 	<script src="get.js"></script>
 	<script>
 		token = "262hj5klv2v084eifdpi65pj6d"
-		version = "1.8-pre6.3"
+		version = "1.8"
 		
 		lessons = {}
 		users = {}
@@ -70,15 +69,15 @@
 		
 		$(function(){
 			var weekNames = [
-			"Twee weken terug",
-			"Vorige week",
-			"Deze week",
-			"Volgende week",
-			"Twee weken vooruit",
-			"Drie weken vooruit",
-			"Vier weken vooruit",
-			"Vijf weken vooruit",
-			"Zes weken vooruit",
+				"Twee weken terug",
+				"Vorige week",
+				"Deze week",
+				"Volgende week",
+				"Twee weken vooruit",
+				"Drie weken vooruit",
+				"Vier weken vooruit",
+				"Vijf weken vooruit",
+				"Zes weken vooruit",
 			]
 			
 			for( var i = -2; i <= 6; i++ ){
@@ -181,7 +180,7 @@
 		<span class="version">v1.8</span>
 		<span>Door Dante van Gemert</span>
 		<span class="offline">offline</span>
-		<span class="update" onclick="updateOnline(options)"><a>update</a></span> <!-- Display: flex? -->
+		<span class="update" onclick="updateOnline(options)"><a>update</a></span>
 		<span class="feedbackButton bottom"><a>feedback</a></span>
 	</header>
 	
@@ -258,11 +257,11 @@
 			<hr>
 			
 			<h1>Versiegeschiedenis</h1>
-			<h2>Versie <code>1.8</code> <sub><sup>1 juni 2018</sup></sub></h2>
+			<h2>Versie <code>1.8</code> <sub><sup>2 juni 2018</sup></sub></h2>
 			<ul>
-				<li>Je kunt nu ook lokalen, klassen en namen opzoeken</li>
+				<li>Je kunt nu naast leerlingnummers en docentcodes ook lokalen, klassen en namen opzoeken</li>
 				<li>Het rooster is nu ook offline beschikbaar, klik links op "update" om handmatig te updaten</li>
-				<li>De naam van wie het rooster is wordt nu weergegeven</li>
+				<li>De naam van wie (of wat) het rooster is wordt nu weergegeven</li>
 				<li>Er is nu een horizontale lijn die aangeeft hoe laat het is</li>
 				<li>Mobiele versie verbeterd</li>
 				<li>Je kunt nu ook 12-uursklok gebruiken!</li>
@@ -270,7 +269,7 @@
 				<li>Contact- en feedbackinformatie toegevoegd</li>
 				<li>Nu over HTTPS!</li>
 				<li>Nog meer speciaal gekleurde dagen toegevoegd!</li>
-				<li>Interne code is herschreven en nu effici&euml;nter</li>
+				<li>Interne code is herschreven en nu effici&euml;nter en overzichtelijker</li>
 			</ul>
 			
 			<h2>Versie <code>1.7</code> <sub><sup>5 december 2017, update: 25 mei 2018</sup></sub></h2>
