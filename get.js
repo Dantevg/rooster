@@ -35,14 +35,22 @@ function Lesson(data){
 
 function formatScheduleURL(options){
 	var base = "https://citadelcollege.zportal.nl/api/v3/"
+	var start = new Date() // saturday before, 10pm
+	var end = new Date() // Saturday after, 10pm
+	start.setDate( start.getDate() + (7*options.offset) - start.getDay() )
+	start.setHours(0,0,0,0)
+	end.setDate( start.getDate() + 7 )
+	end.setHours(0,0,0,0)
+	start = start.getTime() / 1000
+	end = end.getTime() / 1000
 	if( options.scheduleFor.type == "student" || options.scheduleFor.type == "employee" ){
-		return base + "appointments?user=" + options.scheduleFor.id + "&startWeekOffset=" + options.offset + "&endWeekOffset=" + (options.offset+1) + "&access_token=" + token
+		return base + "appointments?user=" + options.scheduleFor.id + "&start=" + start + "&end=" + end + "&access_token=" + token
 	}else if( options.scheduleFor.type == "class" ){
-		return base + "appointments?containsStudentsFromGroupInDepartment=" + options.scheduleFor.id + "&startWeekOffset=" + options.offset + "&endWeekOffset=" + (options.offset+1) + "&access_token=" + token
+		return base + "appointments?containsStudentsFromGroupInDepartment=" + options.scheduleFor.id + "&start=" + start + "&end=" + end + "&access_token=" + token
 	}else if( options.scheduleFor.type == "location" ){
-		return base + "appointments?locationsOfBranch=" + options.scheduleFor.id + "&startWeekOffset=" + options.offset + "&endWeekOffset=" + (options.offset+1) + "&access_token=" + token
+		return base + "appointments?locationsOfBranch=" + options.scheduleFor.id + "&start=" + start + "&end=" + end + "&access_token=" + token
 	}else if( options.scheduleFor.type == "name" ){
-		return base + "appointments?user=" + options.scheduleFor.id + "&startWeekOffset=" + options.offset + "&endWeekOffset=" + (options.offset+1) + "&access_token=" + token
+		return base + "appointments?user=" + options.scheduleFor.id + "&start=" + start + "&end=" + end + "&access_token=" + token
 	}
 }
 
@@ -53,7 +61,7 @@ function formatDataURL(type){
 	}else if( type == "locations" ){
 		return base + "locationofbranches?schoolInSchoolYear=" + departments + "&access_token=" + token
 	}else if( type == "students" ){
-		return base + "users?fields=code,prefix,firstName,lastName&isStudent=true&schoolInSchoolYear=" + departments + "&access_token=" + token
+		return base + "users?fields=code&isStudent=true&schoolInSchoolYear=" + departments + "&access_token=" + token
 	}else if( type == "employees" ){
 		return base + "users?fields=code,prefix,lastName&isEmployee=true&schoolInSchoolYear=" + departments + "&access_token=" + token
 	}else if( type == "departments" ){
@@ -81,7 +89,8 @@ async function getUser(input){
 		// Student/employee code, first name, class, location
 		return users[input][0]
 	}else{
-		// Full name
+		// Full name (student names no longer available, unauthorized :'( )
+		return false
 		var name = input.match(/[a-z]+/g)
 		if( !name ){ return false };
 		var firstName = name[0]
@@ -115,23 +124,24 @@ async function getUsers(){
 		var data = await $.getJSON(formatDataURL("students"))
 		data = data.response.data
 		for( var i = 0; i < data.length; i++ ){
-			var firstName = data[i].firstName.toLowerCase()
+			// Names no longer available, unauthorized :'(
+			/*var firstName = data[i].firstName.toLowerCase()
 			var lastName = data[i].prefix ? data[i].prefix.toLowerCase()+" " : ""
-			lastName += data[i].lastName.toLowerCase()
+			lastName += data[i].lastName.toLowerCase()*/
 			
 			var about = {
 				type: "student",
-				firstName: firstName,
+				/*firstName: firstName,
 				lastName: lastName,
-				name: firstName + " " + lastName,
+				name: firstName + " " + lastName,*/
 				id: data[i].code
 			}
 			
 			users[ data[i].code ] = users[ data[i].code ] || []
 			users[ data[i].code ].push(about)
 			
-			users[firstName] = users[firstName] || []
-			users[firstName].push(about)
+			/*users[firstName] = users[firstName] || []
+			users[firstName].push(about)*/
 		}
 	}
 	
@@ -190,7 +200,7 @@ async function getDepartments(){
 	// Offline
 	if( localStorage.departments ){
 		var offlineDepartments = JSON.parse(localStorage.departments)
-		if( offlineDepartments.date + 2419200000 > Date.now() ){ // Newer than 4 weeks
+		if( offlineDepartments.date + 3600000 > Date.now() ){ // Newer than 1 hour (was 2419200000, 4 weeks)
 			departments = offlineDepartments.data
 			return true
 		}
@@ -206,7 +216,7 @@ async function getDepartments(){
 			yearCode--
 		}
 		for( var i = 0; i < data.length; i++ ){
-			if( data[i].year == yearCode ){
+			if( data[i].year == yearCode && data[i].schoolName == "Citadel GD" ){ // This year, only for GD
 				departments += data[i].id + ","
 			}
 		}

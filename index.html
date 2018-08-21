@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<HTML manifest="cache.appcache">
+<HTML>
+<!-- <HTML manifest="cache.appcache"> -->
 <HEAD>
 	<title>Rooster</title>
 	<link rel="stylesheet" type="text/css" href="style.css">
@@ -13,16 +14,16 @@
 	
 	<meta name="msapplication-config" content="/icons/browserconfig.xml?v=2">
 	<meta name="theme-color" content="#ff4444">
-	<meta name="viewport" content="width=device-width">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	
 	<script src="/cookie.min.js"></script>
 	<script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script>
-	<script src="date.js"></script>
-	<script src="format.js"></script>
-	<script src="get.js"></script>
+	<script src="date.js?v=1.8.1#1"></script>
+	<script src="format.js?v=1.8.1#1"></script>
+	<script src="get.js?v=1.8.1#1"></script>
 	<script>
-		token = "262hj5klv2v084eifdpi65pj6d"
-		version = "1.8"
+		token = "ptoi0m6smgueepj0rs1ksrsvof"
+		version = "1.8.1"
 		
 		lessons = {}
 		users = {}
@@ -48,7 +49,7 @@
 		function updateTimeline(){
 			var d = new Date()
 			var time = d.getHours() + d.getMinutes()/60
-			if( time <= 19 ){ // Within bounds
+			if( time >= 8.5 && time <= 19 ){ // Within bounds
 				$(".tijdlijn").css("top", (time-8.5)*70 - 3)
 			}else{ // Outside bounds, disable
 				$(".tijdlijn").css("top", -50)
@@ -80,6 +81,7 @@
 				"Zes weken vooruit",
 			]
 			
+			// Get mondays
 			for( var i = -2; i <= 6; i++ ){
 				var d = new Date()
 				d.setDate( d.getDate() + (7*i) - d.getDay() + 1 )
@@ -249,7 +251,7 @@
 				<li><code>latestVersion</code>: Bij welke versie je het laatst hier hebt gekeken.</li>
 			</ul>
 			<p>
-				Om je rooster ook offline te kunnen bekijken, wordt de hele pagina offline opgeslagen (<code>Applicatiecaches</code>). Ook wordt de informatie van het rooster zelf opgeslagen (<code>Lokale opslag</code>).
+				Om je rooster sneller te kunnen laden, wordt het rooster, de namen van docenten en de jaarcodes opgeslagen (<code>Lokale opslag</code>).
 			</p><p>
 				Het enige wat naar mijn webserver gestuurd wordt (en dus ook het enige wat ik kan zien), is een unieke ID (dus niet je leerlingnummer), zodat ik kan zien hoeveel mensen deze site gebruiken.
 			</p>
@@ -257,11 +259,11 @@
 			<hr>
 			
 			<h1>Versiegeschiedenis</h1>
-			<h2>Versie <code>1.8</code> <sub><sup>2 juni 2018</sup></sub></h2>
+			<h2>Versie <code>1.8</code> <sub><sup>2 juni 2018, update: 21 augustus 2018</sup></sub></h2>
 			<ul>
-				<li>Je kunt nu naast leerlingnummers en docentcodes ook lokalen, klassen en namen opzoeken</li>
+				<li>Je kunt nu naast leerlingnummers en docentcodes ook lokalen, klassen en namen opzoeken (update 1.8.1: geen leerlingnamen)</li>
 				<li>Het rooster is nu ook offline beschikbaar, klik links op "update" om handmatig te updaten</li>
-				<li>De naam van wie (of wat) het rooster is wordt nu weergegeven</li>
+				<li>De naam van wie (of wat) het rooster is wordt nu weergegeven (update 1.8.1: geen leerlingnamen)</li>
 				<li>Er is nu een horizontale lijn die aangeeft hoe laat het is</li>
 				<li>Mobiele versie verbeterd</li>
 				<li>Je kunt nu ook 12-uursklok gebruiken!</li>

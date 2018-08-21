@@ -135,6 +135,7 @@ function formatSchedule(data){
 
 function showUserName(options){
 	var capitalise = function(input){
+		if( !input ){ return "" }
 		text = input.match(/[a-z]+/g)
 		if( text.join(" ") != input ){
 			// Not a name, leave it
