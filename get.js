@@ -35,14 +35,15 @@ function Lesson(data){
 
 function formatScheduleURL(options){
 	var base = "https://citadelcollege.zportal.nl/api/v3/"
-	var start = new Date() // saturday before, 10pm
-	var end = new Date() // Saturday after, 10pm
+	var start = new Date() // Sunday before, 12am (start of sunday)
 	start.setDate( start.getDate() + (7*options.offset) - start.getDay() )
-	start.setHours(0,0,0,0)
-	end.setDate( start.getDate() + 7 )
-	end.setHours(0,0,0,0)
+	start.setHours( 0,0,0,0 )
+	var end = new Date( start.getTime() )
+	end.setDate( end.getDate() + 7 )
+	
 	start = start.getTime() / 1000
 	end = end.getTime() / 1000
+	
 	if( options.scheduleFor.type == "student" || options.scheduleFor.type == "employee" ){
 		return base + "appointments?user=" + options.scheduleFor.id + "&start=" + start + "&end=" + end + "&access_token=" + token
 	}else if( options.scheduleFor.type == "class" ){
