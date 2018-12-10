@@ -8,8 +8,9 @@ function formatLessons(roosterdata){
 	}
 	
 	// get date of special days
-	var firstDayOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1)
-	var purplefriday = new Date( new Date().getFullYear(), 11, firstDayOfMonth.getDate() + 7 + (5-firstDayOfMonth.getDay() % 7) )
+	var year = new Date().getFullYear()
+	var firstDayOfMonth = new Date( year, new Date().getMonth(), 1 )
+	var purplefriday = new Date( year, 11, 8 + mod(5-firstDayOfMonth.getDay(), 7) )
 	
 	var kingsday = new Date( new Date().getFullYear(), 3, 27 )
 	if( kingsday.getDay() === 0 ){
