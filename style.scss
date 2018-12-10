@@ -61,7 +61,7 @@ sub, sup{
 }
 
 .top{
-  z-index: 10;
+  z-index: 25;
 }
 
 .bottom{
@@ -245,11 +245,6 @@ hr{
   margin-top: 30px;
 }
 
-main{
-  margin-left: 8px;
-}
-
-
 .form label{
   margin-left: 10px;
 }
@@ -269,7 +264,8 @@ main{
   display: none;
 }
 .dagnaam{
-  padding-left: 60px;
+  position: relative;
+  left: 10px;
   span{
     display: inline-block;
     width: 150px;
@@ -305,10 +301,10 @@ main{
   transition: all 0.4s, top 0.3s, color 0s;
   &:hover, &.big{
     span.les-tijd, span.les-eindtijd{
-      color: #000;
+      color: #000 !important;
     }
     span a{
-      color: #14A;
+      color: #14A !important;
     }
   }
 }
@@ -317,7 +313,7 @@ main{
   color: #CCC;
   span.les-lokaal a, span.les-docent a, span.les-klas a, span.les-tijd, span.les-eindtijd{
     color: #CCC;
-  }
+  }/* 
   &:hover, &.big{
     color: #000;
     span.les-tijd, span.les-eindtijd{
@@ -326,23 +322,34 @@ main{
     span a{
       color: #14A;
     }
-  }
+  } */
 }
 
 .lesson.toets{
   background-color: #CCC;
+  span.les-tijd, span.les-eindtijd{
+    color: #999;
+  }
 }
 .lesson.purplefriday{
   background: $purple;
   color: #FFF;
-  span.les-klas a, span.les-tijd, span.les-eindtijd, span.les-docent a{
-    color: #FFF;
+  span.les-klas a, span.les-lokaal a, span.les-tijd, span.les-eindtijd, span.les-docent a{
+    color: #FFF !important;
+  };
+  span.les-tijd, span.les-eindtijd, span.les-klas a{
+    color: #FFF5 !important;
+  }
+  &:hover, &.big{
+    span.les-tijd, span.les-eindtijd, span.les-klas a{
+      color: #FFF !important;
+    }
   }
 }
 .lesson.kingsday{
   background: $orange;
   color: #FFF;
-  span.les-klas a, span.les-tijd, span.les-eindtijd, span.les-docent a{
+  span.les-klas a, span.les-lokaal a, span.les-tijd, span.les-eindtijd, span.les-docent a{
     color: #FFF;
   }
 }
@@ -404,7 +411,7 @@ span.les-eindtijd{
 .tijdlijn{
   position: absolute;
   left: -10px;
-  width: calc( 100vw - 195px );
+  width: 810px;
   height: 6px;
   background: rgba(0,0,0,0.15);
   pointer-events: none;
