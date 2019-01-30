@@ -23,7 +23,7 @@
 	<script src="get.js?v=1.8.2#3"></script>
 	<script>
 		token = "ptoi0m6smgueepj0rs1ksrsvof"
-		version = "1.8.3"
+		version = "1.8.4"
 		
 		lessons = {}
 		users = {}
@@ -101,6 +101,9 @@
 				$(".tijd12").css("display", "block")
 			}
 			
+			options.modifySubjects = Cookies.get("modifySubjects")
+			$("#modifySubjects").val(options.modifySubjects)
+			
 			if( !Cookies.get("latestVersion") ){
 				Cookies.set( "latestVersion", version, {expires: 2190} )
 				$(".newVersion").addClass("active")
@@ -134,7 +137,13 @@
 					$(".tijd24").css("display", "block")
 					$(".tijd12").css("display", "none")
 				}
-				formatSchedule(lessons[options.scheduleFor.id][options.offset+2])
+				formatSchedule( lessons[options.scheduleFor.id][options.offset+2], options )
+			})
+			
+			$("#modifySubjects").change(function(){
+				Cookies.set("modifySubjects", $("#modifySubjects").val(), {expires: 2190})
+				options.modifySubjects = $("#modifySubjects").val()
+				formatSchedule( lessons[options.scheduleFor.id][options.offset+2], options )
 			})
 			
 			$("#print").click(function(){
@@ -239,12 +248,21 @@
 	<div tab="info">
 		<main>
 			<h1>Opties</h1>
-			24-uursklok
-			<label class="switch">
-				<input type="checkbox" name="12h" id="12h">
-				<span></span>
-			</label>
-			12-uursklok
+			<p>
+				24-uursklok
+				<label class="switch">
+					<input type="checkbox" name="12h" id="12h">
+					<span></span>
+				</label>
+				12-uursklok
+			</p><p>
+				Verander namen van vakken:
+				<select id="modifySubjects">
+					<option value="false">Niet</option>
+					<option value="short">Korte namen</option>
+					<option value="long">Lange namen</option>
+				</select>
+			</p>
 			
 			<hr>
 			

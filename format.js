@@ -1,3 +1,38 @@
+var replaceLong = {
+	ak: "aardrijkskunde",
+	biol: "biologie",
+	dutl: "duits",
+	econ: "economie",
+	entl: "engels",
+	fatl: "frans",
+	kubv: "kunst",
+	mt: "mentorles",
+	nat: "natuurkunde",
+	netl: "nederlands",
+	schk: "scheikunde",
+	wisa: "wiskunde A",
+	wisb: "wiskunde B",
+	wisc: "wiskunde C",
+	wisd: "wiskunde D",
+}
+
+var replaceShort = {
+	biol: "bio",
+	dutl: "du",
+	econ: "eco",
+	entl: "en",
+	fatl: "fr",
+	kubv: "ku",
+	nat: "na",
+	netl: "ne",
+	schk: "sk",
+	wisa: "wi A",
+	wisb: "wi B",
+	wisc: "wi C",
+	wisd: "wi D",
+	zbb: "zb",
+}
+
 function formatLessons(roosterdata){
 	var use12h = ( Cookies.get("12h") == "true" )
 	
@@ -26,7 +61,17 @@ function formatLessons(roosterdata){
 		$(div).css("top", (lesson.starttime-8.5)*70)
 		$(div).css("height", lesson.size*70)
 		
-		insert("les-vak", lesson.desc.vak, lesson.subjectChanged)
+		if( options.modifySubjects == "false" || options.modifySubjects == undefined ){
+			insert("les-vak", lesson.desc.vak, lesson.subjectChanged)
+		}else{
+			var subject = lesson.desc.vak
+			if( options.modifySubjects == "short" ){
+				insert("les-vak", replaceShort[subject] || subject, lesson.subjectChanged)
+			}else if( options.modifySubjects == "long" ){
+				insert("les-vak", replaceLong[subject] || subject, lesson.subjectChanged)
+			}
+		}
+		
 		insert("les-lokaal", lesson.desc.lokaal, lesson.locationChanged)
 		insert("les-docent", lesson.desc.docent)
 		insert("les-opmerking", lesson.desc.opmerking)
@@ -72,7 +117,7 @@ function registerClickCallbacks(elem){
 	})
 }
 
-function formatSchedule(data){
+function formatSchedule( data, options ){
 	// Empty previous schedule
 	for( var i = 0; i < 5; i++ ){
 		$("main .rooster .dag-"+i).empty()
@@ -80,7 +125,7 @@ function formatSchedule(data){
 	
 	// Format lessons
 	setTimeout(function(){
-		formatLessons(data)
+		formatLessons( data, options )
 		
 		// Add event listeners
 		$("#lesson-overlay.active").click(function(){

@@ -325,7 +325,7 @@ async function updateOffline(options){
 	var data = getOffline(options)
 	if( data ){
 		data = await checkChange(data, options)
-		formatSchedule(data)
+		formatSchedule( data, options )
 		lessons[options.scheduleFor.id] = lessons[options.scheduleFor.id] || []
 		lessons[options.scheduleFor.id][options.offset+2] = data
 		
@@ -340,7 +340,7 @@ async function updateOnline(options){
 	var data = await getOnline(options)
 	if( data ){
 		data = await checkChange(data, options)
-		formatSchedule(data)
+		formatSchedule( data, options )
 		lessons[options.scheduleFor.id] = lessons[options.scheduleFor.id] || []
 		lessons[options.scheduleFor.id][options.offset+2] = data
 		
@@ -354,7 +354,7 @@ async function update(options){
 		return false
 	}
 	if( lessons[options.scheduleFor.id] && lessons[options.scheduleFor.id][options.offset+2] ){ // Saved locally
-		formatSchedule(lessons[options.scheduleFor.id][options.offset+2])
+		formatSchedule( lessons[options.scheduleFor.id][options.offset+2], options )
 		if( options.scheduleFor.id == defaultUser && localStorage["lessons-"+(new Date().getWeek()+options.offset)] ){
 			$("span.offline").css("display", "block")
 		}else{
