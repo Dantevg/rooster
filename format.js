@@ -38,7 +38,7 @@ function formatLessons(roosterdata){
 	
 	function insert(cssclass, data, change){
 		if(data != "" && data != undefined){
-			$(div).append("<span class='" + cssclass + (change ? " changed" : "") + "'>" + data + "</span><br>")
+			$(lesson.elem).append("<span class='" + cssclass + (change ? " changed" : "") + "'>" + data + "</span><br>")
 		}
 	}
 	
@@ -54,12 +54,12 @@ function formatLessons(roosterdata){
 	
 	for( var i = 0; i < roosterdata.length; i++ ){
 		var lesson = roosterdata[i]
-		var div = $("<div>").appendTo("main .rooster .dag-"+(lesson.day-1))
+		lesson.elem = $("<div>").appendTo("main .rooster .dag-"+(lesson.day-1))
 		
-		$(div).addClass("lesson")
+		$(lesson.elem).addClass("lesson")
 		
-		$(div).css("top", (lesson.starttime-8.5)*70)
-		$(div).css("height", lesson.size*70)
+		$(lesson.elem).css("top", (lesson.starttime-8.5)*70)
+		$(lesson.elem).css("height", lesson.size*70)
 		
 		if( options.modifySubjects == "false" || options.modifySubjects == undefined ){
 			insert("les-vak", lesson.desc.vak, lesson.subjectChanged)
@@ -81,24 +81,24 @@ function formatLessons(roosterdata){
 		insert("les-verdanderbericht", lesson.desc.veranderbericht)
 
 		if(lesson.desc.type == "exam"){
-			$(div).addClass("toets")
+			$(lesson.elem).addClass("toets")
 		}
 		
 		// check for special days
 		if( lesson.startdate.getMonth() == purplefriday.getMonth() && lesson.startdate.getDate() == purplefriday.getDate() ){
-			$(div).addClass("purplefriday")
+			$(lesson.elem).addClass("purplefriday")
 		}
 		if( lesson.startdate.getMonth() == kingsday.getMonth() && lesson.startdate.getDate() == kingsday.getDate() ){
-			$(div).addClass("kingsday")
+			$(lesson.elem).addClass("kingsday")
 		}
 		
 		// Check for removed lessons
 		if( lesson.cancelled ){
-			$(div).addClass("cancelled")
+			$(lesson.elem).addClass("cancelled")
 		}
 		
-		var top = $(div).css("top")
-		var height = $(div).css("height")
+		var top = $(lesson.elem).css("top")
+		var height = $(lesson.elem).css("height")
 		$("main .rooster .dag-"+(lesson.day-1)).append("<div class='placeholder' style='top:"+top+"; height:"+height+";'></div>")
 	}
 }
