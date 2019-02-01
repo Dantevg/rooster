@@ -36,9 +36,22 @@ var replaceShort = {
 function formatLessons(roosterdata){
 	var use12h = ( Cookies.get("12h") == "true" )
 	
-	function insert(cssclass, data, change){
+	var join = function(data){
+		var output = ""
+		for( var i = 0; i < data.length; i++ ){
+			if( i != 0 ){ output += ", " };
+			output += "<a>" + data[i] + "</a>"
+		}
+		return output
+	}
+	
+	var insert = function(cssclass, data, change){
 		if(data != "" && data != undefined){
-			$(div).append("<span class='" + cssclass + (change ? " changed" : "") + "'>" + data + "</span><br>")
+			if( typeof data == "string" ){
+				$(lesson.elem).append("<span class='" + cssclass + (change ? " changed" : "") + "'>" + data + "</span><br>")
+			}else if( typeof data == "object" ){
+				$(lesson.elem).append("<span class='" + cssclass + (change ? " changed" : "") + "'>" + join(data) + "</span><br>")
+			}
 		}
 	}
 	
@@ -54,17 +67,17 @@ function formatLessons(roosterdata){
 	
 	for( var i = 0; i < roosterdata.length; i++ ){
 		var lesson = roosterdata[i]
-		var div = $("<div>").appendTo("main .rooster .dag-"+(lesson.day-1))
+		lesson.elem = $("<div>").appendTo("main .rooster .dag-"+(lesson.day-1))
 		
-		$(div).addClass("lesson")
+		$(lesson.elem).addClass("lesson")
 		
-		$(div).css("top", (lesson.starttime-8.5)*70)
-		$(div).css("height", lesson.size*70)
+		$(lesson.elem).css("top", (lesson.starttime-8.5)*70)
+		$(lesson.elem).css("height", lesson.size*70)
 		
 		if( options.modifySubjects == "false" || options.modifySubjects == undefined ){
-			insert("les-vak", lesson.desc.vak, lesson.subjectChanged)
+			insert("les-vak", lesson.subjects, lesson.subjectChanged)
 		}else{
-			var subject = lesson.desc.vak
+			var subject = lesson.subjects[0]
 			if( options.modifySubjects == "short" ){
 				insert("les-vak", replaceShort[subject] || subject, lesson.subjectChanged)
 			}else if( options.modifySubjects == "long" ){
@@ -72,34 +85,36 @@ function formatLessons(roosterdata){
 			}
 		}
 		
-		insert("les-lokaal", lesson.desc.lokaal, lesson.locationChanged)
-		insert("les-docent", lesson.desc.docent)
-		insert("les-opmerking", lesson.desc.opmerking)
-		insert("les-klas", lesson.desc.klas)
+		insert("les-lokaal", lesson.locations, lesson.locationChanged)
+		insert("les-docent", lesson.teachers)
+		insert("les-opmerking", lesson.remark)
+		insert("les-klas", lesson.groups)
 		insert("les-tijd", lesson.startdate.toLocaleTimeString("en-US", {hour12: use12h, hour: "2-digit", minute: "2-digit"}))
 		insert("les-eindtijd", lesson.enddate.toLocaleTimeString("en-US", {hour12: use12h, hour: "2-digit", minute: "2-digit"}))
-		insert("les-verdanderbericht", lesson.desc.veranderbericht)
+		insert("les-verdanderbericht", lesson.changeDescription)
 
-		if(lesson.desc.type == "exam"){
-			$(div).addClass("toets")
+		if(lesson.type == "exam"){
+			$(lesson.elem).addClass("toets")
 		}
 		
 		// check for special days
-		if( lesson.startdate.getMonth() == purplefriday.getMonth() && lesson.startdate.getDate() == purplefriday.getDate() ){
-			$(div).addClass("purplefriday")
+		if( lesson.purpleFriday ){
+			$(lesson.elem).addClass("purplefriday")
 		}
-		if( lesson.startdate.getMonth() == kingsday.getMonth() && lesson.startdate.getDate() == kingsday.getDate() ){
-			$(div).addClass("kingsday")
+		if( lesson.kingsday ){
+			$(lesson.elem).addClass("kingsday")
 		}
 		
 		// Check for removed lessons
 		if( lesson.cancelled ){
-			$(div).addClass("cancelled")
+			$(lesson.elem).addClass("cancelled")
 		}
 		
-		var top = $(div).css("top")
-		var height = $(div).css("height")
+		var top = $(lesson.elem).css("top")
+		var height = $(lesson.elem).css("height")
 		$("main .rooster .dag-"+(lesson.day-1)).append("<div class='placeholder' style='top:"+top+"; height:"+height+";'></div>")
+		
+		$(lesson.elem).find(".les-vak")
 	}
 }
 
