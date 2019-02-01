@@ -36,9 +36,22 @@ var replaceShort = {
 function formatLessons(roosterdata){
 	var use12h = ( Cookies.get("12h") == "true" )
 	
-	function insert(cssclass, data, change){
+	var join = function(data){
+		var output = ""
+		for( var i = 0; i < data.length; i++ ){
+			if( i != 0 ){ output += ", " };
+			output += "<a>" + data[i] + "</a>"
+		}
+		return output
+	}
+	
+	var insert = function(cssclass, data, change){
 		if(data != "" && data != undefined){
-			$(lesson.elem).append("<span class='" + cssclass + (change ? " changed" : "") + "'>" + data + "</span><br>")
+			if( typeof data == "string" ){
+				$(lesson.elem).append("<span class='" + cssclass + (change ? " changed" : "") + "'>" + data + "</span><br>")
+			}else if( typeof data == "object" ){
+				$(lesson.elem).append("<span class='" + cssclass + (change ? " changed" : "") + "'>" + join(data) + "</span><br>")
+			}
 		}
 	}
 	
@@ -62,9 +75,9 @@ function formatLessons(roosterdata){
 		$(lesson.elem).css("height", lesson.size*70)
 		
 		if( options.modifySubjects == "false" || options.modifySubjects == undefined ){
-			insert("les-vak", lesson.desc.vak, lesson.subjectChanged)
+			insert("les-vak", lesson.subjects, lesson.subjectChanged)
 		}else{
-			var subject = lesson.desc.vak
+			var subject = lesson.subjects[0]
 			if( options.modifySubjects == "short" ){
 				insert("les-vak", replaceShort[subject] || subject, lesson.subjectChanged)
 			}else if( options.modifySubjects == "long" ){
@@ -72,23 +85,23 @@ function formatLessons(roosterdata){
 			}
 		}
 		
-		insert("les-lokaal", lesson.desc.lokaal, lesson.locationChanged)
-		insert("les-docent", lesson.desc.docent)
-		insert("les-opmerking", lesson.desc.opmerking)
-		insert("les-klas", lesson.desc.klas)
+		insert("les-lokaal", lesson.locations, lesson.locationChanged)
+		insert("les-docent", lesson.teachers)
+		insert("les-opmerking", lesson.remark)
+		insert("les-klas", lesson.groups)
 		insert("les-tijd", lesson.startdate.toLocaleTimeString("en-US", {hour12: use12h, hour: "2-digit", minute: "2-digit"}))
 		insert("les-eindtijd", lesson.enddate.toLocaleTimeString("en-US", {hour12: use12h, hour: "2-digit", minute: "2-digit"}))
-		insert("les-verdanderbericht", lesson.desc.veranderbericht)
+		insert("les-verdanderbericht", lesson.changeDescription)
 
-		if(lesson.desc.type == "exam"){
+		if(lesson.type == "exam"){
 			$(lesson.elem).addClass("toets")
 		}
 		
 		// check for special days
-		if( lesson.startdate.getMonth() == purplefriday.getMonth() && lesson.startdate.getDate() == purplefriday.getDate() ){
+		if( lesson.purpleFriday ){
 			$(lesson.elem).addClass("purplefriday")
 		}
-		if( lesson.startdate.getMonth() == kingsday.getMonth() && lesson.startdate.getDate() == kingsday.getDate() ){
+		if( lesson.kingsday ){
 			$(lesson.elem).addClass("kingsday")
 		}
 		
@@ -100,6 +113,8 @@ function formatLessons(roosterdata){
 		var top = $(lesson.elem).css("top")
 		var height = $(lesson.elem).css("height")
 		$("main .rooster .dag-"+(lesson.day-1)).append("<div class='placeholder' style='top:"+top+"; height:"+height+";'></div>")
+		
+		$(lesson.elem).find(".les-vak")
 	}
 }
 

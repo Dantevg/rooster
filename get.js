@@ -1,38 +1,3 @@
-function Lesson(data){
-	var join = function(data){
-		var output = ""
-		for( var i = 0; i < data.length; i++ ){
-			if( i != 0 ){ output += ", " };
-			output += "<a>" + data[i] + "</a>"
-		}
-		return output
-	}
-	
-	this.startdate = new Date(data.start * 1000)
-	this.starttime = this.startdate.getHours() + this.startdate.getMinutes() / 60
-	this.startslot = data.startTimeSlot
-	
-	this.enddate = new Date(data.end * 1000)
-	this.endtime = this.enddate.getHours() + this.enddate.getMinutes() / 60
-	this.endslot = data.endTimeSlot
-	
-	this.day = this.startdate.getDay()
-	this.size = this.endtime - this.starttime
-	
-	this.desc = {}
-	this.desc.vak = data.subjects.join(", ")
-	this.desc.klas = join(data.groups)
-	this.desc.docent = join(data.teachers)
-	this.desc.lokaal = join(data.locations)
-	this.desc.opmerking = data.remark
-	this.desc.veranderbericht = data.changeDescription
-	this.desc.type = data.type
-	
-	this.cancelled = data.cancelled
-	this.locationChanged = false
-	this.subjectChanged = false
-}
-
 function formatScheduleURL(options){
 	var base = "https://citadelcollege.zportal.nl/api/v3/"
 	var start = new Date() // Sunday before, 12am (start of sunday)
@@ -230,13 +195,27 @@ async function getDepartments(){
 }
 
 async function checkChange(thisWeek, options){
+	// No schedule data before 2 weeks, display no change
 	if( options.offset <= -2 ){
 		return thisWeek
 	}
 	
+	// Copy options object and modify it to get last week
 	var getOptions = Object.assign({}, options)
 	getOptions.offset -= 1
 	var lastWeek = await get(getOptions)
+	
+	var arrayEqual = function( arr1, arr2 ){
+		if( arr1.length != arr2.length ){
+			return false
+		}
+		for( var i = 0; i < arr1.length; i++ ){
+			if( arr1[i] !== arr2[i] ){
+				return false
+			}
+		}
+		return true
+	}
 	
 	for( var i = 0; i < thisWeek.length; i++ ){
 		var thisLesson = thisWeek[i]
@@ -247,10 +226,10 @@ async function checkChange(thisWeek, options){
 			// Check if lesson on same location (same lesson)
 			if( prevLesson.startdate.getDay() == thisLesson.startdate.getDay() && prevLesson.startslot == thisLesson.startslot ){
 				// Same lesson, check if changed
-				if( prevLesson.desc.lokaal != thisLesson.desc.lokaal ){
+				if( !arrayEqual(prevLesson.locations, thisLesson.locations) ){
 					thisLesson.locationChanged = true
 				}
-				if( prevLesson.vak != thisLesson.vak ){
+				if( !arrayEqual(prevLesson.subjects, thisLesson.subjects) ){
 					thisLesson.subjectChanged = true
 				}
 				break;
@@ -270,6 +249,12 @@ function removeOldSchedules(){
 			var weekNumber = Number( key.substring(8) )
 			if( weekNumber != NaN && weekNumber + 2 < new Date().getWeek() ){
 				localStorage.removeItem(key)
+			}else{
+				// Check for pre-1.8.5 schedule data
+				var data = JSON.parse( localStorage[key] )
+				if( data.data[0] && data.data[0].desc ){
+					localStorage.removeItem(key)
+				}
 			}
 		}
 	}
@@ -277,11 +262,46 @@ function removeOldSchedules(){
 
 
 function format(data){
-	var lessons = []
-	for( var i = 0; i < data.length; i++ ){
-		lessons.push( new Lesson(data[i]) )
+	// get date of special days
+	var year = new Date().getFullYear()
+	var firstDayOfMonth = new Date( year, new Date().getMonth(), 1 )
+	var purplefriday = new Date( year, 11, 8 + mod(5-firstDayOfMonth.getDay(), 7) )
+	
+	var kingsday = new Date( new Date().getFullYear(), 3, 27 )
+	if( kingsday.getDay() === 0 ){
+		kingsday.setDate( kingsDay.getDate() - 1 )
 	}
-	return lessons
+	
+	for( var i = 0; i < data.length; i++ ){
+		data[i].startdate = new Date(data[i].start * 1000)
+		data[i].starttime = data[i].startdate.getHours() + data[i].startdate.getMinutes() / 60
+		data[i].startslot = data[i].startTimeSlot
+		
+		data[i].enddate = new Date(data[i].end * 1000)
+		data[i].endtime = data[i].enddate.getHours() + data[i].enddate.getMinutes() / 60
+		data[i].endslot = data[i].endTimeSlot
+		
+		data[i].day = data[i].startdate.getDay()
+		data[i].size = data[i].endtime - data[i].starttime
+		
+		// Sort arrays for comparison
+		data[i].subjects = data[i].subjects.sort()
+		data[i].groups = data[i].groups.sort()
+		data[i].teachers = data[i].teachers.sort()
+		data[i].locations = data[i].locations.sort()
+		
+		// Add special day checks
+		data[i].purpleFriday = data[i].startdate.getMonth() == purplefriday.getMonth()
+			&& data[i].startdate.getDate() == purplefriday.getDate()
+		data[i].kingsday = data[i].startdate.getMonth() == kingsday.getMonth()
+			&& data[i].startdate.getDate() == kingsday.getDate()
+		
+		// Change check flags
+		data[i].locationChanged = false
+		data[i].subjectChanged = false
+	}
+	
+	return data
 }
 
 
@@ -353,6 +373,9 @@ async function update(options){
 	if( !options || !options.scheduleFor ){
 		return false
 	}
+	
+	removeOldSchedules()
+	
 	if( lessons[options.scheduleFor.id] && lessons[options.scheduleFor.id][options.offset+2] ){ // Saved locally
 		formatSchedule( lessons[options.scheduleFor.id][options.offset+2], options )
 		if( options.scheduleFor.id == defaultUser && localStorage["lessons-"+(new Date().getWeek()+options.offset)] ){
@@ -365,8 +388,6 @@ async function update(options){
 			updateOnline(options)
 		}
 	}
-	
-	removeOldSchedules()
 }
 
 async function get(options){
