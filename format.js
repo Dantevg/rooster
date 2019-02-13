@@ -36,33 +36,27 @@ var replaceShort = {
 function formatLessons(roosterdata){
 	var use12h = ( Cookies.get("12h") == "true" )
 	
-	var join = function(data){
+	var join = function(data, noLink){
 		var output = ""
 		for( var i = 0; i < data.length; i++ ){
-			if( i != 0 ){ output += ", " };
-			output += "<a>" + data[i] + "</a>"
+			if( i != 0 ){ output += ", " }
+			if( noLink ){
+				output += data[i]
+			}else{
+				output += "<a>" + data[i] + "</a>"
+			}
 		}
 		return output
 	}
 	
-	var insert = function(cssclass, data, change){
+	var insert = function(cssclass, data, change, noLink){
 		if(data != "" && data != undefined){
 			if( typeof data == "string" ){
 				$(lesson.elem).append("<span class='" + cssclass + (change ? " changed" : "") + "'>" + data + "</span><br>")
 			}else if( typeof data == "object" ){
-				$(lesson.elem).append("<span class='" + cssclass + (change ? " changed" : "") + "'>" + join(data) + "</span><br>")
+				$(lesson.elem).append("<span class='" + cssclass + (change ? " changed" : "") + "'>" + join(data, noLink) + "</span><br>")
 			}
 		}
-	}
-	
-	// get date of special days
-	var year = new Date().getFullYear()
-	var firstDayOfMonth = new Date( year, new Date().getMonth(), 1 )
-	var purplefriday = new Date( year, 11, 8 + mod(5-firstDayOfMonth.getDay(), 7) )
-	
-	var kingsday = new Date( new Date().getFullYear(), 3, 27 )
-	if( kingsday.getDay() === 0 ){
-		kingsday.setDate( kingsDay.getDate() - 1 )
 	}
 	
 	for( var i = 0; i < roosterdata.length; i++ ){
@@ -75,13 +69,13 @@ function formatLessons(roosterdata){
 		$(lesson.elem).css("height", lesson.size*70)
 		
 		if( options.modifySubjects == "false" || options.modifySubjects == undefined ){
-			insert("les-vak", lesson.subjects, lesson.subjectChanged)
+			insert("les-vak", lesson.subjects, lesson.subjectChanged, true)
 		}else{
 			var subject = lesson.subjects[0]
 			if( options.modifySubjects == "short" ){
-				insert("les-vak", replaceShort[subject] || subject, lesson.subjectChanged)
+				insert("les-vak", replaceShort[subject] || subject, lesson.subjectChanged, true)
 			}else if( options.modifySubjects == "long" ){
-				insert("les-vak", replaceLong[subject] || subject, lesson.subjectChanged)
+				insert("les-vak", replaceLong[subject] || subject, lesson.subjectChanged, true)
 			}
 		}
 		
