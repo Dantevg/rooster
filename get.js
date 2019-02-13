@@ -10,13 +10,13 @@ function formatScheduleURL(options){
 	end = end.getTime() / 1000
 	
 	if( options.scheduleFor.type == "student" || options.scheduleFor.type == "employee" ){
-		return base + "appointments?user=" + options.scheduleFor.id + "&start=" + start + "&end=" + end + "&access_token=" + token
+		return base + "appointments?user=" + options.scheduleFor.id + "&start=" + start + "&end=" + end + "&access_token=" + token + "&valid=true"
 	}else if( options.scheduleFor.type == "class" ){
-		return base + "appointments?containsStudentsFromGroupInDepartment=" + options.scheduleFor.id + "&start=" + start + "&end=" + end + "&access_token=" + token
+		return base + "appointments?containsStudentsFromGroupInDepartment=" + options.scheduleFor.id + "&start=" + start + "&end=" + end + "&access_token=" + token + "&valid=true"
 	}else if( options.scheduleFor.type == "location" ){
-		return base + "appointments?locationsOfBranch=" + options.scheduleFor.id + "&start=" + start + "&end=" + end + "&access_token=" + token
+		return base + "appointments?locationsOfBranch=" + options.scheduleFor.id + "&start=" + start + "&end=" + end + "&access_token=" + token + "&valid=true"
 	}else if( options.scheduleFor.type == "name" ){
-		return base + "appointments?user=" + options.scheduleFor.id + "&start=" + start + "&end=" + end + "&access_token=" + token
+		return base + "appointments?user=" + options.scheduleFor.id + "&start=" + start + "&end=" + end + "&access_token=" + token + "&valid=true"
 	}
 }
 
